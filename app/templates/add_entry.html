@@ -1,0 +1,26 @@
+{% extends "layouts/floating_layout.html" %}
+
+{% block content %}
+<div class="entry-editor">
+    <h2 style="margin-bottom: 20px;">New Entry</h2>
+    <input type="text" placeholder="Title of your day..."
+        style="font-size: 1.5em; font-weight: bold; background: transparent; border: none; border-bottom: 1px solid var(--glass-border);">
+
+    <!-- Rich Text Toolbar (Visual Only for now) -->
+    <div class="toolbar" style="margin: 20px 0; display: flex; gap: 10px;">
+        <button class="btn-icon"><i class="fas fa-bold"></i></button>
+        <button class="btn-icon"><i class="fas fa-italic"></i></button>
+        <button class="btn-icon"><i class="fas fa-list"></i></button>
+        <button class="btn-icon"><i class="fas fa-image"></i></button>
+        <button class="btn-icon"><i class="fas fa-microphone"></i></button>
+    </div>
+
+    <textarea style="height: 300px; resize: none;" placeholder="Start writing..."></textarea>
+
+    <div class="actions" style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px;">
+        <button class="btn-primary"
+            style="background: transparent; border: 1px solid white; color: white;">Discard</button>
+        <button class="btn-primary">Save Entry</button>
+    </div>
+</div>
+{% endblock %}
