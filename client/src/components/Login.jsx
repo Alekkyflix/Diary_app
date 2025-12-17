@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import TiltedGlassCard from './TiltedGlassCard';
 
 export default function Login() {
     const [formData, setFormData] = useState({ username: '', password: '' });
@@ -22,7 +23,7 @@ export default function Login() {
 
     return (
         <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div className="glass-panel" style={{ padding: '40px', width: '320px', textAlign: 'center' }}>
+            <TiltedGlassCard style={{ padding: '40px', width: '320px', textAlign: 'center' }}>
                 <h2 style={{ marginBottom: '20px' }}>Welcome Back</h2>
                 {error && <div style={{ color: '#FF5F56', marginBottom: '10px' }}>{error}</div>}
                 <form onSubmit={handleSubmit}>
@@ -41,7 +42,7 @@ export default function Login() {
                 <p style={{ marginTop: '20px', fontSize: '0.9em' }}>
                     No account? <Link to="/register">Register</Link>
                 </p>
-            </div>
+            </TiltedGlassCard>
         </div>
     );
 }
