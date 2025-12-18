@@ -13,6 +13,10 @@ const Entry = sequelize.define('Entry', {
     userId: {
         type: DataTypes.INTEGER,
         allowNull: false
+    },
+    mood: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 });
 

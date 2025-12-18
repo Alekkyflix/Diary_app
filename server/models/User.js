@@ -16,6 +16,14 @@ const User = sequelize.define('User', {
     password: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    currentStreak: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
+    lastEntryDate: {
+        type: DataTypes.DATE,
+        allowNull: true
     }
 });
 
