@@ -24,6 +24,48 @@ const User = sequelize.define('User', {
     lastEntryDate: {
         type: DataTypes.DATE,
         allowNull: true
+    },
+    pfpUrl: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    is2FAEnabled: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    themePreference: {
+        type: DataTypes.STRING,
+        defaultValue: 'dark'
+    },
+    gamificationEnabled: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+    },
+    // Privacy Settings
+    showMediaToGroups: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+    },
+    showNotesToGroups: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    allowActivityTracking: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+    },
+    // Recovery
+    resetToken: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    resetTokenExpiry: {
+        type: DataTypes.DATE,
+        allowNull: true
+    },
+    recoveryBackupCodes: {
+        type: DataTypes.TEXT, // Stringified JSON
+        allowNull: true
     }
 });
 

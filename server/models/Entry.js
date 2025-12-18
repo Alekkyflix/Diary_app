@@ -17,6 +17,18 @@ const Entry = sequelize.define('Entry', {
     mood: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    audioData: {
+        type: DataTypes.BLOB('long'), // Store audio as binary
+        allowNull: true
+    },
+    photoData: {
+        type: DataTypes.BLOB('long'), // Store photo as binary
+        allowNull: true
+    },
+    location: {
+        type: DataTypes.JSON, // Store { lat, lng, name }
+        allowNull: true
     }
 });
 
