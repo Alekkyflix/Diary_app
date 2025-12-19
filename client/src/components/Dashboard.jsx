@@ -40,7 +40,7 @@ export default function Dashboard() {
                     <h2>Welcome back, <span style={{ color: 'var(--accent-color)' }}>{user.username}</span></h2>
                     <p style={{ color: 'var(--text-secondary)' }}>Here is your daily snapshot.</p>
                 </div>
-                <Link to="/new-entry" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
+                <Link to="/add" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
                     <Plus size={18} /> New Entry
                 </Link>
             </div>

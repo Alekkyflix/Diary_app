@@ -6,7 +6,7 @@ import TiltedGlassCard from './TiltedGlassCard';
 import { useTheme } from '../contexts/ThemeContext';
 
 export default function Settings() {
-    const { theme, setTheme, themes } = useTheme();
+    const { theme, setTheme, themes, season, setSeason } = useTheme();
     const [activeTab, setActiveTab] = useState('account');
     const [settings, setSettings] = useState({
         email: '',
@@ -37,10 +37,11 @@ export default function Settings() {
         }
     };
 
-    const handleUpdateSettings = async () => {
+    const handleUpdateSettings = async (updatedFields = null) => {
         try {
-            await api.put('/user/settings', settings);
-            setMessage({ type: 'success', text: 'Settings updated successfully!' });
+            const dataToSave = updatedFields || settings;
+            await api.put('/user/settings', dataToSave);
+            if (!updatedFields) setMessage({ type: 'success', text: 'Settings updated successfully!' });
         } catch (err) {
             setMessage({ type: 'error', text: 'Failed to update settings.' });
         }
@@ -271,7 +272,12 @@ export default function Settings() {
                                     {Object.entries(themes).map(([key, t]) => (
                                         <div 
                                             key={key} 
-                                            onClick={() => { setTheme(key); handleUpdateSettings(); }}
+                                            onClick={() => { 
+                                                const newSettings = { ...settings, themePreference: key };
+                                                setSettings(newSettings);
+                                                setTheme(key);
+                                                handleUpdateSettings(newSettings);
+                                            }}
                                             style={{
                                                 padding: '15px',
                                                 borderRadius: '15px',
@@ -287,6 +293,35 @@ export default function Settings() {
                                             <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: t.accent, margin: '0 auto 10px' }}></div>
                                             <div style={{ color: t.text, fontSize: '0.8em', fontWeight: 'bold' }}>{t.name}</div>
                                         </div>
+                                    ))}
+                                </div>
+
+                                <h3 style={{ marginTop: '40px', marginBottom: '20px' }}>Seasonal Effects</h3>
+                                <div style={{ display: 'flex', gap: '15px' }}>
+                                    {[
+                                        { id: 'winter', name: 'Winter / Christmas', icon: '❄️' },
+                                        { id: 'summer', name: 'Summer Vibes', icon: '☀️' }
+                                    ].map(s => (
+                                        <button
+                                            key={s.id}
+                                            onClick={() => setSeason(s.id)}
+                                            style={{
+                                                flex: 1,
+                                                padding: '20px',
+                                                borderRadius: '15px',
+                                                background: season === s.id ? 'var(--accent-color)' : 'rgba(255,255,255,0.05)',
+                                                border: 'none',
+                                                color: 'white',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                gap: '10px'
+                                            }}
+                                        >
+                                            <span style={{ fontSize: '2rem' }}>{s.icon}</span>
+                                            <span style={{ fontWeight: 'bold' }}>{s.name}</span>
+                                        </button>
                                     ))}
                                 </div>
                             </div>

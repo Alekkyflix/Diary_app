@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 
 import { Save, ArrowLeft, Trash2, Heart, Type, Image as ImageIcon, MapPin, Mic, Volume2 } from 'lucide-react';
 import TiltedGlassCard from './TiltedGlassCard';

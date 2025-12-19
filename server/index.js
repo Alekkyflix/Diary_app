@@ -93,43 +93,126 @@ app.post('/api/auth/register', async (req, res) => {
 
 app.post('/api/auth/check-user', async (req, res) => {
     try {
-        const { username } = req.body;
+        let { username } = req.body;
+        console.log(`[AUTH] Checking user existence for: "${username}"`);
+        
         if (!username) return res.status(400).json({ error: 'Username or email is required' });
 
+        username = username.trim();
+        
+        // If it looks like an email, lowercase it for consistency
+        if (username.includes('@')) {
+            username = username.toLowerCase();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(username)) {
+                return res.status(400).json({ error: 'Please enter a valid email format' });
+            }
+        } else {
+            // Username validation: 3-20 chars, alphanumeric/underscore
+            const userRegex = /^[a-zA-Z0-9_]{3,20}$/;
+            if (!userRegex.test(username)) {
+                console.log(`[AUTH] Regex failed for: "${username}"`);
+                return res.status(400).json({ error: 'Username must be 3-20 characters (letters, numbers, underscores only)' });
+            }
+        }
+
+
+        const lowerInput = username.toLowerCase();
+        console.log(`[AUTH] Searching for LOWER(username/email) = "${lowerInput}"`);
         const user = await User.findOne({
             where: {
-                [Op.or]: [{ username }, { email: username }]
+                [Op.or]: [
+                    sequelize.where(sequelize.fn('LOWER', sequelize.col('username')), lowerInput),
+                    sequelize.where(sequelize.fn('LOWER', sequelize.col('email')), lowerInput)
+                ]
             }
         });
 
         if (!user) {
+            console.log(`[AUTH] No match found for "${lowerInput}"`);
             return res.status(404).json({ error: 'We couldn’t find an account with that username or email.' });
         }
 
+
+        console.log(`[AUTH] User found: ${user.username}`);
         res.json({ message: 'User exists', username: user.username });
     } catch (error) {
+        console.error(`[AUTH] Verification error:`, error);
         res.status(500).json({ error: 'Verification failed' });
     }
 });
 
 
 
+app.post('/api/auth/social-login', async (req, res) => {
+    try {
+        const { provider, socialId, email, username } = req.body;
+        
+        if (!provider || !socialId) {
+            return res.status(400).json({ error: 'Provider and Social ID are required' });
+        }
+
+        const idField = provider === 'google' ? 'googleId' : 
+                        provider === 'github' ? 'githubId' : 
+                        provider === 'microsoft' ? 'microsoftId' : null;
+
+        if (!idField) return res.status(400).json({ error: 'Invalid provider' });
+
+        let user = await User.findOne({ where: { [idField]: socialId } });
+
+        if (!user && email) {
+            user = await User.findOne({ where: { email } });
+            if (user) {
+                user[idField] = socialId;
+                await user.save();
+            }
+        }
+
+        if (!user) {
+            user = await User.create({
+                username: username || `user_${Math.random().toString(36).substring(2, 7)}`,
+                email: email || `${socialId}@${provider}.placeholder`,
+                [idField]: socialId,
+                password: null
+            });
+        }
+
+        const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '24h' });
+        res.json({ 
+            token, 
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                themePreference: user.themePreference,
+                pfpUrl: user.pfpUrl
+            }
+        });
+    } catch (error) {
+        logError(error, 'Social login failed');
+        res.status(500).json({ error: 'Social login failed' });
+    }
+});
+
 app.post('/api/auth/login', async (req, res) => {
+
     try {
         const { username, password } = req.body;
 
-        if (!username || !password) {
-            return res.status(400).json({ error: 'Please enter username/email and password' });
+        if (!password) {
+            return res.status(400).json({ error: 'Password is required' });
         }
 
+        const lowerInput = username.toLowerCase();
         const user = await User.findOne({
             where: {
                 [Op.or]: [
-                    { username: username },
-                    { email: username }
+                    sequelize.where(sequelize.fn('LOWER', sequelize.col('username')), lowerInput),
+                    sequelize.where(sequelize.fn('LOWER', sequelize.col('email')), lowerInput)
                 ]
             }
         });
+
 
         if (!user) {
             return res.status(404).json({ error: 'Account not found' });
@@ -138,6 +221,7 @@ app.post('/api/auth/login', async (req, res) => {
         if (!(await user.validPassword(password))) {
             return res.status(401).json({ error: 'Incorrect password. Please try again.' });
         }
+
 
         const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '24h' });
         res.json({ 
@@ -212,6 +296,16 @@ app.get('/api/entries', authenticate, async (req, res) => {
         res.json(entries);
     } catch (error) {
         res.status(500).json({ error: 'Fetching entries failed' });
+    }
+});
+
+app.get('/api/entries/:id', authenticate, async (req, res) => {
+    try {
+        const entry = await Entry.findOne({ where: { id: req.params.id, userId: req.userId } });
+        if (!entry) return res.status(404).json({ error: 'Entry not found' });
+        res.json(entry);
+    } catch (error) {
+        res.status(500).json({ error: 'Fetching entry failed' });
     }
 });
 
@@ -563,8 +657,30 @@ app.use((err, req, res, next) => {
 
 
 // Sync DB
-sequelize.sync({ alter: true }).then(async () => {
+sequelize.sync().then(async () => {
     console.log('Database synced');
+
+    // Manual migration for SQLite (since alter: true fails on unique columns)
+    const tableInfo = await sequelize.query("PRAGMA table_info(Users)");
+    const columns = tableInfo[0].map(c => c.name);
+    
+    const missingColumns = [
+        { name: 'googleId', type: 'VARCHAR(255)' },
+        { name: 'githubId', type: 'VARCHAR(255)' },
+        { name: 'microsoftId', type: 'VARCHAR(100)' } // Re-using existing or similar
+    ];
+
+    for (const col of missingColumns) {
+        if (!columns.includes(col.name)) {
+            try {
+                // Not using UNIQUE here to avoid SQLite alter table limitations
+                await sequelize.query(`ALTER TABLE Users ADD COLUMN ${col.name} ${col.type}`);
+                console.log(`Added missing column: ${col.name}`);
+            } catch (err) {
+                console.error(`Failed to add column ${col.name}:`, err.message);
+            }
+        }
+    }
 
     // Seed Badges
     const badges = [
@@ -581,3 +697,4 @@ sequelize.sync({ alter: true }).then(async () => {
         console.log(`Server running on http://localhost:${PORT}`);
     });
 });
+

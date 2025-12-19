@@ -15,8 +15,22 @@ const User = sequelize.define('User', {
     },
     password: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true // Nullable for social login users
     },
+    googleId: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    githubId: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    microsoftId: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+
+
     currentStreak: {
         type: DataTypes.INTEGER,
         defaultValue: 0

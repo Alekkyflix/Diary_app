@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
 export default function CustomCursor() {
+    const isEnabled = localStorage.getItem('customCursor') !== 'false';
     const [position, setPosition] = useState({ x: 0, y: 0 });
+
     const [clicked, setClicked] = useState(false);
     const [linkHovered, setLinkHovered] = useState(false);
 
@@ -41,7 +43,10 @@ export default function CustomCursor() {
         return () => removeEventListeners();
     }, []);
 
+    if (!isEnabled) return null;
+
     return (
+
         <div
             style={{
                 width: 30,
