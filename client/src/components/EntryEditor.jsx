@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Save, ArrowLeft, Trash2, Heart, Type, Image as ImageIcon, MapPin, Mic } from 'lucide-react';
+
+import { Save, ArrowLeft, Trash2, Heart, Type, Image as ImageIcon, MapPin, Mic, Volume2 } from 'lucide-react';
 import TiltedGlassCard from './TiltedGlassCard';
 import api from '../api';
+
 
 import AudioRecorder from './AudioRecorder';
 
@@ -79,27 +81,22 @@ export default function EntryEditor() {
 
     const handleSave = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const formData = new FormData();
-            formData.append('title', title);
-            formData.append('content', content);
-            formData.append('mood', mood);
+            const formDataToUpload = new FormData();
+            formDataToUpload.append('title', title);
+            formDataToUpload.append('content', content);
+            formDataToUpload.append('mood', mood);
             if (audioBlob) {
-                formData.append('audio', audioBlob, 'voice_note.webm');
+                formDataToUpload.append('audio', audioBlob, 'voice_note.webm');
             }
 
-            await axios.post('http://localhost:5000/api/entries', formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
-                }
+            await api.post('/entries', formDataToUpload, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
 
             // Share to Group if selected
             if (selectedGroupId) {
-                await axios.post(`http://localhost:5000/api/groups/${selectedGroupId}/messages`,
-                    { content: `📖 **Shared Entry: ${title}**\n\n${content}` },
-                    { headers: { Authorization: `Bearer ${token}` } }
+                await api.post(`/groups/${selectedGroupId}/messages`,
+                    { content: `📖 **Shared Entry: ${title}**\n\n${content}` }
                 );
             }
 
@@ -109,6 +106,7 @@ export default function EntryEditor() {
             alert('Failed to save entry');
         }
     };
+
 
     return (
         <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Camera, Heart, MessageCircle, MapPin, Music } from 'lucide-react';
+import { Camera, Heart, MessageCircle, MapPin, Music, Plus } from 'lucide-react';
+
 import SnapEditor from './SnapEditor';
 import TiltedGlassCard from './TiltedGlassCard';
 import api from '../api';

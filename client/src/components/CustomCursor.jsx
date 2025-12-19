@@ -52,17 +52,21 @@ export default function CustomCursor() {
                 top: 0,
                 borderRadius: '50%',
                 pointerEvents: 'none',
-                zIndex: 9999,
+                zIndex: 100000, // Absolute top
                 transform: `translate(${position.x - 15}px, ${position.y - 15}px) scale(${clicked ? 0.8 : (linkHovered ? 1.5 : 1)})`,
-                transition: 'transform 0.1s ease-out',
-                background: linkHovered ? 'rgba(255, 46, 99, 0.1)' : 'transparent',
-                boxShadow: '0 0 15px rgba(255, 46, 99, 0.3)'
+                transition: 'transform 0.1s ease-out, background 0.2s',
+                background: linkHovered ? 'rgba(255, 46, 99, 0.15)' : 'transparent',
+                boxShadow: linkHovered ? '0 0 20px rgba(255, 46, 99, 0.5)' : '0 0 15px rgba(255, 46, 99, 0.3)',
+                mixBlendMode: 'difference' // Makes it visible against everything and less likely to feel like an "element"
             }}
+
         >
             <div style={{
                 width: 6, height: 6, background: 'white', borderRadius: '50%',
-                position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)'
+                position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                pointerEvents: 'none'
             }}></div>
+
         </div>
     );
 }

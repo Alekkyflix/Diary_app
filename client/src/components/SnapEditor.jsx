@@ -1,6 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
+
 import { useNavigate } from 'react-router-dom';
-import { Camera, X, Check, Music, MapPin, Type, Sticker, Download, RotateCcw } from 'lucide-react';
+
+import { Camera, X, Check, Music, MapPin, Type, Sticker, Download, RotateCcw, Send, Smile } from 'lucide-react';
+
 import api from '../api';
 import TiltedGlassCard from './TiltedGlassCard';
 
@@ -226,9 +229,10 @@ export default function SnapEditor({ onClose, onPosted }) {
             <div style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', color: 'white' }}>
                 <button onClick={() => { stopCameraStream(); onClose(); }}><X /></button>
                 <h3>Snap Studio</h3>
-                <button onClick={handlePost} disabled={!image} style={{ color: image ? '#08D9D6' : 'gray' }}>
-                    {uploading ? 'Posting...' : <Send />}
+                <button onClick={handlePost} disabled={!image || isUploading} style={{ color: image ? '#08D9D6' : 'gray' }}>
+                    {isUploading ? 'Posting...' : <Send />}
                 </button>
+
             </div>
 
             {/* Canvas / Camera Area */}

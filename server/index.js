@@ -75,12 +75,44 @@ const authenticate = (req, res, next) => {
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { username, email, password } = req.body;
+        console.log(`[AUTH] Registering user: ${username} (${email})`);
+        
+        if (!username || !email || !password) {
+            return res.status(400).json({ error: 'Username, email and password are required' });
+        }
+
         const user = await User.create({ username, email, password });
+        console.log(`[AUTH] User created: ${user.id}`);
         res.json({ message: 'User registered successfully' });
     } catch (error) {
+        console.error(`[AUTH] Registration failed: ${error.message}`);
+        logError(error, 'User registration failed');
         res.status(500).json({ error: 'User registration failed', details: error.message });
     }
 });
+
+app.post('/api/auth/check-user', async (req, res) => {
+    try {
+        const { username } = req.body;
+        if (!username) return res.status(400).json({ error: 'Username or email is required' });
+
+        const user = await User.findOne({
+            where: {
+                [Op.or]: [{ username }, { email: username }]
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'We couldn’t find an account with that username or email.' });
+        }
+
+        res.json({ message: 'User exists', username: user.username });
+    } catch (error) {
+        res.status(500).json({ error: 'Verification failed' });
+    }
+});
+
+
 
 app.post('/api/auth/login', async (req, res) => {
     try {
@@ -99,17 +131,31 @@ app.post('/api/auth/login', async (req, res) => {
             }
         });
 
-        if (!user || !(await user.validPassword(password))) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+        if (!user) {
+            return res.status(404).json({ error: 'Account not found' });
+        }
+
+        if (!(await user.validPassword(password))) {
+            return res.status(401).json({ error: 'Incorrect password. Please try again.' });
         }
 
         const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '24h' });
-        res.json({ token, username: user.username, settings: { theme: user.themePreference, pfpUrl: user.pfpUrl } });
+        res.json({ 
+            token, 
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                themePreference: user.themePreference,
+                pfpUrl: user.pfpUrl
+            }
+        });
     } catch (error) {
         logError(error, 'Login failed');
         res.status(500).json({ error: 'Login failed', details: error.message });
     }
 });
+
 
 // --- RECOVERY ROUTES ---
 

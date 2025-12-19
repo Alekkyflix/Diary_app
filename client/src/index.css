@@ -36,15 +36,11 @@ body {
   cursor: none; /* Hide system cursor */
 }
 
-/* Ensure all clickable elements hide system cursor too */
-a,
-button,
-[role="button"],
-input,
-textarea,
-select {
-  cursor: none !important;
+/* Rely on body hide for most elements, but don't force it on interactive ones to avoid event confusion */
+a, button, input {
+  cursor: none;
 }
+
 
 @keyframes breathing-bg {
   0% {

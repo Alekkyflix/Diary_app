@@ -120,7 +120,8 @@ export default function GroupChat() {
 
             {/* Input Area */}
             <div style={{ padding: '20px', background: 'rgba(0,0,0,0.2)', backdropFilter: 'blur(10px)' }}>
-                <form onSubmit={handleSend} style={{ display: 'flex', gap: '10px', maxWidth: '1000px', margin: '0 auto' }}>
+                <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '10px', maxWidth: '1000px', margin: '0 auto' }}>
+
                     <input
                         type="text"
                         placeholder="Type a message..."

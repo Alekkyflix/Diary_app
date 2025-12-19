@@ -24,9 +24,7 @@ function App() {
   return (
     <ThemeProvider>
       <Router>
-        <CustomCursor />
         <FluidBackground />
-        <RippleEffect />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -42,8 +40,12 @@ function App() {
             <Route path="/settings" element={isAuthenticated ? <Settings /> : <Navigate to="/login" />} />
           </Route>
         </Routes>
+        <CustomCursor />
+        <RippleEffect />
       </Router>
     </ThemeProvider>
+
+
   );
 
 }
