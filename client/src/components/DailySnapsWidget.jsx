@@ -97,9 +97,8 @@ export default function DailySnapsWidget() {
                             display: 'flex', justifyContent: 'center', gap: '5px',
                             marginTop: '-15px', position: 'relative', zIndex: 5
                         }}>
-                            <button onClick={() => handleReaction(snap.id, '❤️')} style={{ border: 'none', background: 'white', borderRadius: '50%', width: 30, height: 30, boxShadow: '0 5px 15px rgba(0,0,0,0.2)', cursor: 'pointer' }}>❤️</button>
-                            <button onClick={() => handleReaction(snap.id, '🔥')} style={{ border: 'none', background: 'white', borderRadius: '50%', width: 30, height: 30, boxShadow: '0 5px 15px rgba(0,0,0,0.2)', cursor: 'pointer' }}>🔥</button>
-                            {/* Only showing 2 for space, but user can add more logic later */}
+                            <button onClick={() => handleReact(snap.id, '❤️')} style={{ border: 'none', background: 'white', borderRadius: '50%', width: 30, height: 30, boxShadow: '0 5px 15px rgba(0,0,0,0.2)', cursor: 'pointer' }}>❤️</button>
+                            <button onClick={() => handleReact(snap.id, '🔥')} style={{ border: 'none', background: 'white', borderRadius: '50%', width: 30, height: 30, boxShadow: '0 5px 15px rgba(0,0,0,0.2)', cursor: 'pointer' }}>🔥</button>
                         </div>
 
                         {/* Reaction Counts */}

@@ -5,6 +5,7 @@ import sequelize from './database.js';
 import zlib from 'zlib';
 import multer from 'multer';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
 // Models
 import User from './models/User.js';
@@ -178,6 +179,10 @@ app.post('/api/auth/social-login', async (req, res) => {
         }
 
         const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '24h' });
+        
+        user.lastLogin = new Date();
+        await user.save();
+
         res.json({ 
             token, 
             user: {
@@ -224,6 +229,10 @@ app.post('/api/auth/login', async (req, res) => {
 
 
         const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '24h' });
+
+        user.lastLogin = new Date();
+        await user.save();
+
         res.json({ 
             token, 
             user: {
@@ -284,6 +293,61 @@ app.post('/api/auth/reset-password', async (req, res) => {
     } catch (error) {
         logError(error, 'Reset password failed');
         res.status(500).json({ error: 'Failed to reset password' });
+    }
+});
+
+
+app.post('/api/user/verify-password', authenticate, async (req, res) => {
+    try {
+        const { password } = req.body;
+        const user = await User.findByPk(req.userId);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        const isValid = await user.validPassword(password);
+        if (!isValid) return res.status(401).json({ error: 'Invalid current password' });
+
+        res.json({ message: 'Password verified' });
+    } catch (err) {
+        res.status(500).json({ error: 'Verification failed' });
+    }
+});
+
+app.get('/api/user/activity', authenticate, async (req, res) => {
+    try {
+        const user = await User.findByPk(req.userId);
+        res.json({ lastLogin: user.lastLogin });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch activity' });
+    }
+});
+
+app.post('/api/user/app-lock', authenticate, async (req, res) => {
+    try {
+        const { pin } = req.body; // Set to null to disable
+        const user = await User.findByPk(req.userId);
+        if (pin) {
+            const hashedPin = await bcrypt.hash(pin, 10);
+            user.appLockPin = hashedPin;
+        } else {
+            user.appLockPin = null;
+        }
+        await user.save();
+        res.json({ message: pin ? 'App Lock enabled' : 'App Lock disabled' });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to update App Lock' });
+    }
+});
+
+app.post('/api/user/verify-app-lock', authenticate, async (req, res) => {
+    try {
+        const { pin } = req.body;
+        const user = await User.findByPk(req.userId);
+        if (!user.appLockPin) return res.json({ skip: true });
+
+        const isValid = await bcrypt.compare(pin, user.appLockPin);
+        res.json({ isValid });
+    } catch (err) {
+        res.status(500).json({ error: 'PIN verification failed' });
     }
 });
 

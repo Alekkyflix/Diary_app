@@ -10,8 +10,8 @@ export default function TiltedGlassCard({ children, className = "", style = {} }
     const mouseXSpring = useSpring(x);
     const mouseYSpring = useSpring(y);
 
-    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["17.5deg", "-17.5deg"]);
-    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-17.5deg", "17.5deg"]);
+    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
 
     const handleMouseMove = (e) => {
         if (!ref.current) return;
@@ -45,20 +45,20 @@ export default function TiltedGlassCard({ children, className = "", style = {} }
                 rotateY,
                 rotateX,
                 transformStyle: "preserve-3d",
+                position: 'relative',
                 ...style
             }}
             className={`glass-panel tilted-card ${className}`}
         >
-            <div
-                style={{
-                    transform: "translateZ(50px)",
-                    transformStyle: "preserve-3d",
-                }}
-            >
+            {/* Content - Simple stacking */}
+            <div style={{ 
+                position: 'relative', 
+                zIndex: 20
+            }}>
                 {children}
             </div>
 
-            {/* Glare Effect */}
+            {/* Glare Effect - Behind content */}
             <div
                 style={{
                     position: 'absolute',
@@ -66,17 +66,17 @@ export default function TiltedGlassCard({ children, className = "", style = {} }
                     borderRadius: '24px',
                     background: 'linear-gradient(125deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 60%)',
                     opacity: 0,
-                    zIndex: 10,
+                    zIndex: 1,
                     pointerEvents: 'none',
                     transition: 'opacity 0.2s',
                 }}
                 className="card-glare"
             />
             <style>{`
-        .tilted-card:hover .card-glare {
-            opacity: 1 !important;
-        }
-      `}</style>
+                .tilted-card:hover .card-glare {
+                    opacity: 1 !important;
+                }
+            `}</style>
         </motion.div>
     );
 }

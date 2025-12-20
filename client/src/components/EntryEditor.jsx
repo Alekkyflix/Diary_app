@@ -7,6 +7,7 @@ import api from '../api';
 
 
 import AudioRecorder from './AudioRecorder';
+import CustomAlert from './CustomAlert';
 
 export default function EntryEditor() {
     const [title, setTitle] = useState('');
@@ -15,7 +16,9 @@ export default function EntryEditor() {
     const [showRecorder, setShowRecorder] = useState(false);
     const [audioBlob, setAudioBlob] = useState(null);
     const [groups, setGroups] = useState([]);
-    const [selectedGroupId, setSelectedGroupId] = useState('');
+    const [visibility, setVisibility] = useState('private'); // 'private', 'public', or groupID
+    const [isSaved, setIsSaved] = useState(false);
+    const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'info', title: '', message: '', mode: 'alert', onConfirm: null });
     const navigate = useNavigate();
     const { id } = useParams(); // Added for editing existing entries
 
@@ -51,8 +54,8 @@ export default function EntryEditor() {
                     setTitle(entryData.title);
                     setContent(entryData.content);
                     setMood(entryData.mood);
-                    setAudioBlob(entryData.audioUrl ? new Blob([], { type: 'audio/webm' }) : null); // Placeholder for existing audio
-                    setFormData(entryData); // Populate formData for other fields if needed
+                    setAudioBlob(entryData.audioUrl ? new Blob([], { type: 'audio/webm' }) : null);
+                    setIsSaved(true); // Existing entries are "saved" until modified
                 } catch (err) {
                     console.error("Failed to fetch entry", err);
                 }
@@ -72,14 +75,50 @@ export default function EntryEditor() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [id]); // Re-run effect if ID changes
 
+    const triggerAlert = (config) => {
+        setAlertConfig({ ...alertConfig, isOpen: true, ...config });
+    };
+
     const handleAudioSave = (blob) => {
         setAudioBlob(blob);
-        // In a real app, we would upload this blob to the server
-        // For now we will just acknowledge it
-        alert("Voice Note recorded! (Note: File upload to server is not yet implemented, but the blob is captured)");
+        triggerAlert({
+            type: 'success',
+            title: 'Note Recorded',
+            message: 'Voice Note recorded! (Note: File upload functionality is coming soon, but your note is captured locally for now).'
+        });
+    };
+
+    const getWordCount = (text) => text.trim() ? text.trim().split(/\s+/).length : 0;
+    const wordCount = getWordCount(content);
+
+    const handleBack = () => {
+        const hasChanges = title || content || audioBlob;
+        if (hasChanges && !isSaved) {
+            triggerAlert({
+                type: 'warning',
+                title: 'Discard Changes?',
+                message: 'You have unsaved changes. Are you sure you want to discard them?',
+                mode: 'confirm',
+                onConfirm: () => {
+                    setAlertConfig(prev => ({ ...prev, isOpen: false }));
+                    navigate('/');
+                }
+            });
+        } else {
+            navigate('/');
+        }
     };
 
     const handleSave = async () => {
+        if (visibility === 'public' && wordCount > 20) {
+            triggerAlert({
+                type: 'error',
+                title: 'Story too long',
+                message: 'Public stories must be 20 words or less. Please shorten your note.'
+            });
+            return;
+        }
+
         try {
             const formDataToUpload = new FormData();
             formDataToUpload.append('title', title);
@@ -93,17 +132,32 @@ export default function EntryEditor() {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 
-            // Share to Group if selected
-            if (selectedGroupId) {
-                await api.post(`/groups/${selectedGroupId}/messages`,
+            // If visibility is a group ID
+            if (visibility !== 'private' && visibility !== 'public') {
+                await api.post(`/groups/${visibility}/messages`,
                     { content: `📖 **Shared Entry: ${title}**\n\n${content}` }
                 );
             }
 
+            // If visibility is public, share as Story (Snap)
+            if (visibility === 'public') {
+                // Generate a simple text-to-image SNAP (placeholder for now, will refine)
+                await api.post('/api/snaps', {
+                    caption: title,
+                    imageUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(content.substring(0, 10))}&background=random&size=512&color=fff&bold=true&length=5`, // Dynamic placeholder
+                    song: { title: 'Diary Story', artist: 'Me' }
+                });
+            }
+
+            setIsSaved(true);
             navigate('/');
         } catch (err) {
             console.error(err);
-            alert('Failed to save entry');
+            triggerAlert({
+                type: 'error',
+                title: 'Save Failed',
+                message: 'Failed to save your entry. Please try again.'
+            });
         }
     };
 
@@ -118,16 +172,16 @@ export default function EntryEditor() {
             )}
 
             <div style={{ marginBottom: '20px' }}>
-                <Link to="/" style={{ color: 'white', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <button onClick={handleBack} style={{ background: 'none', border: 'none', color: 'white', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', padding: 0 }}>
                     <ArrowLeft size={16} /> Back
-                </Link>
+                </button>
             </div>
 
             <input
                 type="text"
                 placeholder="Title of your day..."
                 value={title}
-                onChange={e => setTitle(e.target.value)}
+                onChange={e => { setTitle(e.target.value); setIsSaved(false); }}
                 style={{ fontSize: '1.5em', fontWeight: 'bold', background: 'transparent', border: 'none', borderBottom: '1px solid var(--glass-border)', paddingLeft: 0, color: 'white' }}
             />
 
@@ -177,20 +231,27 @@ export default function EntryEditor() {
             <textarea
                 placeholder="Start writing..."
                 value={content}
-                onChange={e => setContent(e.target.value)}
+                onChange={e => { setContent(e.target.value); setIsSaved(false); }}
                 style={{ flex: 1, resize: 'none', fontSize: '1.1em', lineHeight: '1.6', background: 'transparent', border: 'none', color: 'white' }}
             ></textarea>
 
+            {visibility === 'public' && (
+                <div style={{ fontSize: '0.8em', opacity: 0.7, textAlign: 'right', color: wordCount > 20 ? '#FF5F56' : 'white' }}>
+                    {wordCount} / 20 words
+                </div>
+            )}
+
             <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <select
-                    value={selectedGroupId}
-                    onChange={e => setSelectedGroupId(e.target.value)}
+                    value={visibility}
+                    onChange={e => setVisibility(e.target.value)}
                     style={{
                         background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
                         color: 'white', padding: '10px', borderRadius: '8px', outline: 'none'
                     }}
                 >
-                    <option value="" style={{ color: 'black' }}>🔒 Private (Don't Share)</option>
+                    <option value="private" style={{ color: 'black' }}>🔒 Private (Don't Share)</option>
+                    <option value="public" style={{ color: 'black' }}>🌍 Public (Share as Story)</option>
                     {groups.map(g => (
                         <option key={g.id} value={g.id} style={{ color: 'black' }}>👥 Share to {g.name}</option>
                     ))}
@@ -207,6 +268,11 @@ export default function EntryEditor() {
                 100% { transform: scale(1); }
             }
         `}</style>
+            
+            <CustomAlert 
+                {...alertConfig} 
+                onClose={() => setAlertConfig(prev => ({ ...prev, isOpen: false }))} 
+            />
         </div>
     );
 }

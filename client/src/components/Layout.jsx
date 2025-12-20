@@ -1,16 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { LogOut, Settings, LayoutDashboard, Share2, HelpCircle, User } from 'lucide-react';
-
+import CustomAlert from './CustomAlert';
 
 export default function Layout() {
     const navigate = useNavigate();
+    const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'info', title: '', message: '', mode: 'alert', onConfirm: null });
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        navigate('/login');
-        window.location.reload();
+        setAlertConfig({
+            isOpen: true,
+            type: 'warning',
+            title: 'Confirm Logout',
+            message: 'Are you sure you want to log out of DIARY_OS? Any unsaved changes might be lost.',
+            mode: 'confirm',
+            onConfirm: () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                navigate('/login');
+                window.location.reload();
+            }
+        });
     };
 
     return (
@@ -57,6 +67,10 @@ export default function Layout() {
                 <Outlet />
             </div>
 
+            <CustomAlert 
+                {...alertConfig} 
+                onClose={() => setAlertConfig(prev => ({ ...prev, isOpen: false }))} 
+            />
         </div>
     );
 }

@@ -36,9 +36,15 @@ body {
 }
 
 html.custom-cursor-active,
-html.custom-cursor-active *,
-body.custom-cursor-active,
-body.custom-cursor-active * {
+body.custom-cursor-active {
+  cursor: none !important;
+}
+
+/* Let the custom cursor handle the visual, but keep the underlying hit area clean */
+html.custom-cursor-active button,
+html.custom-cursor-active a,
+html.custom-cursor-active input[type="checkbox"],
+html.custom-cursor-active [role="button"] {
   cursor: none !important;
 }
 

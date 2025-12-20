@@ -36,9 +36,37 @@ export default function Dashboard() {
         <div>
             {/* Header */}
             <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                    <h2>Welcome back, <span style={{ color: 'var(--accent-color)' }}>{user.username}</span></h2>
-                    <p style={{ color: 'var(--text-secondary)' }}>Here is your daily snapshot.</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                    {user.pfpUrl ? (
+                        <img 
+                            src={user.pfpUrl} 
+                            alt="Profile" 
+                            style={{ 
+                                width: '60px', 
+                                height: '60px', 
+                                borderRadius: '50%', 
+                                border: '3px solid var(--accent-color)',
+                                objectFit: 'cover'
+                            }} 
+                        />
+                    ) : (
+                        <div style={{ 
+                            width: '60px', 
+                            height: '60px', 
+                            borderRadius: '50%', 
+                            background: 'rgba(255,255,255,0.1)', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center',
+                            border: '1px solid rgba(255,255,255,0.2)'
+                        }}>
+                            <Smile size={30} color="var(--accent-color)" />
+                        </div>
+                    )}
+                    <div>
+                        <h2>Welcome back, <span style={{ color: 'var(--accent-color)' }}>{user.username}</span></h2>
+                        <p style={{ color: 'var(--text-secondary)' }}>Here is your daily snapshot.</p>
+                    </div>
                 </div>
                 <Link to="/add" className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
                     <Plus size={18} /> New Entry

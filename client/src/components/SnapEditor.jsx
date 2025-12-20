@@ -327,11 +327,11 @@ export default function SnapEditor({ onClose, onPosted }) {
                             <Smile />
                             <div style={{ fontSize: '0.7em' }}>Sticker</div>
                         </div>
-                        <div onClick={addSong} style={{ textAlign: 'center', cursor: 'pointer', opacity: song ? 0.5 : 1 }}>
+                        <div onClick={addSong} style={{ textAlign: 'center', cursor: 'pointer', opacity: selectedSong ? 0.5 : 1 }}>
                             <Music />
                             <div style={{ fontSize: '0.7em' }}>Music</div>
                         </div>
-                        <div onClick={addLocation} style={{ textAlign: 'center', cursor: 'pointer', opacity: location ? 0.5 : 1 }}>
+                        <div onClick={addLocation} style={{ textAlign: 'center', cursor: 'pointer', opacity: selectedLocation ? 0.5 : 1 }}>
                             <MapPin />
                             <div style={{ fontSize: '0.7em' }}>Loc</div>
                         </div>

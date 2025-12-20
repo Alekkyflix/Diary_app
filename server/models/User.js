@@ -80,6 +80,14 @@ const User = sequelize.define('User', {
     recoveryBackupCodes: {
         type: DataTypes.TEXT, // Stringified JSON
         allowNull: true
+    },
+    lastLogin: {
+        type: DataTypes.DATE,
+        allowNull: true
+    },
+    appLockPin: {
+        type: DataTypes.STRING, // Hashed PIN
+        allowNull: true
     }
 });
 

@@ -11,6 +11,7 @@ import Layout from './components/Layout'; // Re-added import
 import FluidBackground from './components/FluidBackground';
 import RippleEffect from './components/RippleEffect';
 import Snowfall from './components/Snowfall';
+import FallingLeaves from './components/FallingLeaves';
 
 import SocialHub from './components/SocialHub';
 import GroupChat from './components/GroupChat';
@@ -19,10 +20,16 @@ import Settings from './components/Settings';
 import CustomCursor from './components/CustomCursor';
 import CursorToggle from './components/CursorToggle';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+import AppLockOverlay from './components/AppLockOverlay';
 
 function AppContent() {
   const { season, setTheme } = useTheme();
+  const [isUnlocked, setIsUnlocked] = React.useState(false);
   const isAuthenticated = !!localStorage.getItem('token');
+
+  useEffect(() => {
+    if (!isAuthenticated) setIsUnlocked(false);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const syncTheme = async () => {
@@ -43,7 +50,9 @@ function AppContent() {
   return (
     <Router>
       <FluidBackground />
+      {isAuthenticated && !isUnlocked && <AppLockOverlay onUnlock={() => setIsUnlocked(true)} />}
       {season === 'winter' && <Snowfall />}
+      {(season === 'spring' || season === 'autumn') && <FallingLeaves type={season} />}
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

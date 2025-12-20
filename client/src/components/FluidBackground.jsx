@@ -34,10 +34,12 @@ export default function FluidBackground() {
     const color2 = currentTheme.accent;
     const color1 = theme === 'dark' ? '#08D9D6' : 
                    theme === 'emerald' ? '#34D399' : 
-                   theme === 'royal' ? '#C7D2FE' : '#08D9D6';
+                   theme === 'royal' ? '#C7D2FE' : 
+                   theme === 'hacker' ? '#15803D' : '#08D9D6';
     const color3 = theme === 'dark' ? '#EAEAEA' : 
                    theme === 'emerald' ? '#065F46' : 
-                   theme === 'royal' ? '#4338CA' : '#EAEAEA';
+                   theme === 'royal' ? '#4338CA' : 
+                   theme === 'hacker' ? '#052E16' : '#EAEAEA';
 
     return (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1, pointerEvents: 'none' }}>

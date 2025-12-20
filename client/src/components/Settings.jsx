@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../api';
-import { User, Shield, Eye, Palette, Trash2, Save, Key, UserPlus } from 'lucide-react';
+import { User, Shield, Eye, EyeOff, Palette, Trash2, Save, Key, Camera, Upload, X, Clock, Lock } from 'lucide-react';
 
 import TiltedGlassCard from './TiltedGlassCard';
 import { useTheme } from '../contexts/ThemeContext';
+import CustomAlert from './CustomAlert';
 
 export default function Settings() {
     const { theme, setTheme, themes, season, setSeason } = useTheme();
@@ -22,10 +23,32 @@ export default function Settings() {
     const [passwords, setPasswords] = useState({ current: '', next: '', confirm: '' });
     const [message, setMessage] = useState({ type: '', text: '' });
     const [loading, setLoading] = useState(true);
+    const [showCamera, setShowCamera] = useState(false);
+    const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'info', title: '', message: '', mode: 'alert', onConfirm: null });
+    
+    // Security states
+    const [securityModal, setSecurityModal] = useState(null); // 'verify', 'update', 'app-lock'
+    const [passwordData, setPasswordData] = useState({ current: '', next: '', confirm: '' });
+    const [showPasswords, setShowPasswords] = useState({ current: false, next: false, confirm: false, pin: false });
+    const [lastLogin, setLastLogin] = useState(null);
+    const [pin, setPin] = useState('');
+
+    const videoRef = useRef(null);
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         fetchSettings();
+        fetchActivity();
     }, []);
+
+    const fetchActivity = async () => {
+        try {
+            const res = await api.get('/user/activity');
+            setLastLogin(res.data.lastLogin);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const fetchSettings = async () => {
         try {
@@ -37,44 +60,268 @@ export default function Settings() {
         }
     };
 
+    const handleVerifyPassword = async (e) => {
+        e.preventDefault();
+        try {
+            await api.post('/user/verify-password', { password: passwordData.current });
+            setSecurityModal('update');
+        } catch (err) {
+            triggerAlert({
+                type: 'error',
+                title: 'Verification Failed',
+                message: 'Incorrect current password. Please try again.'
+            });
+        }
+    };
+
+    const handleFinalUpdatePassword = async (e) => {
+        e.preventDefault();
+        if (passwordData.next !== passwordData.confirm) {
+            return triggerAlert({
+                type: 'error',
+                title: 'Match Error',
+                message: 'New passwords do not match.'
+            });
+        }
+        try {
+            await api.put('/user/password', {
+                currentPassword: passwordData.current,
+                newPassword: passwordData.next
+            });
+            triggerAlert({
+                type: 'success',
+                title: 'Password Updated',
+                message: 'Your password has been changed successfully.'
+            });
+            setSecurityModal(null);
+            setPasswordData({ current: '', next: '', confirm: '' });
+        } catch (err) {
+            triggerAlert({
+                type: 'error',
+                title: 'Update Failed',
+                message: err.response?.data?.error || 'Failed to change password.'
+            });
+        }
+    };
+
+    const handleUpdateAppLock = async (e) => {
+        e.preventDefault();
+        try {
+            await api.post('/user/app-lock', { pin });
+            triggerAlert({
+                type: 'success',
+                title: 'App Lock Updated',
+                message: pin ? 'Your security PIN has been set successfully.' : 'App Lock has been disabled.'
+            });
+            setSecurityModal(null);
+        } catch (err) {
+            triggerAlert({
+                type: 'error',
+                title: 'Setup Failed',
+                message: 'Could not update App Lock pin.'
+            });
+        }
+    };
+
+    const triggerAlert = (config) => {
+        setAlertConfig({ ...alertConfig, isOpen: true, ...config });
+    };
+
+    const compressImage = (base64Str, maxWidth = 200, maxHeight = 200) => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = base64Str;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width *= maxHeight / height;
+                        height = maxHeight;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', 0.7)); // 0.7 quality factor
+            };
+        });
+    };
+
     const handleUpdateSettings = async (updatedFields = null) => {
         try {
             const dataToSave = updatedFields || settings;
-            await api.put('/user/settings', dataToSave);
-            if (!updatedFields) setMessage({ type: 'success', text: 'Settings updated successfully!' });
+            const res = await api.put('/user/settings', dataToSave);
+            
+            // Sync local storage so other components (like Dashboard) update immediately
+            const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+            const updatedUser = { ...currentUser, ...res.data };
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            
+            if (!updatedFields) {
+                triggerAlert({
+                    type: 'success',
+                    title: 'Settings Saved',
+                    message: 'Your account settings have been updated successfully.'
+                });
+            }
         } catch (err) {
-            setMessage({ type: 'error', text: 'Failed to update settings.' });
+            triggerAlert({
+                type: 'error',
+                title: 'Update Failed',
+                message: 'Failed to update settings. Please try again.'
+            });
         }
     };
 
     const handlePasswordChange = async (e) => {
         e.preventDefault();
         if (passwords.next !== passwords.confirm) {
-            return setMessage({ type: 'error', text: 'New passwords do not match.' });
+            return triggerAlert({
+                type: 'error',
+                title: 'Match Error',
+                message: 'New passwords do not match.'
+            });
         }
         try {
             await api.put('/user/password', {
                 currentPassword: passwords.current,
                 newPassword: passwords.next
             });
-            setMessage({ type: 'success', text: 'Password changed successfully!' });
+            triggerAlert({
+                type: 'success',
+                title: 'Password Updated',
+                message: 'Your password has been changed successfully.'
+            });
             setPasswords({ current: '', next: '', confirm: '' });
         } catch (err) {
-            setMessage({ type: 'error', text: err.response?.data?.error || 'Failed to change password.' });
+            triggerAlert({
+                type: 'error',
+                title: 'Update Failed',
+                message: err.response?.data?.error || 'Failed to change password.'
+            });
         }
     };
 
     const handleDeleteAccount = async () => {
-        if (!window.confirm("Are you ABSOLUTELY sure? This will delete all your data permanently.")) return;
-        try {
-            await api.delete('/user');
-            localStorage.clear();
-            window.location.href = '/login';
-        } catch (err) {
-            setMessage({ type: 'error', text: 'Failed to delete account.' });
+        triggerAlert({
+            type: 'warning',
+            title: 'Delete Account?',
+            message: 'Are you ABSOLUTELY sure? This will delete all your data permanently and cannot be undone.',
+            mode: 'confirm',
+            onConfirm: async () => {
+                setAlertConfig(prev => ({ ...prev, isOpen: false }));
+                try {
+                    await api.delete('/user');
+                    localStorage.clear();
+                    window.location.href = '/login';
+                } catch (err) {
+                    triggerAlert({
+                        type: 'error',
+                        title: 'Deletion Failed',
+                        message: 'Failed to delete account. Please contact support if this persists.'
+                    });
+                }
+            }
+        });
+    };
+
+
+    const handleFileUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (!file.type.startsWith('image/')) {
+                return triggerAlert({
+                    type: 'error',
+                    title: 'Invalid File',
+                    message: 'Please upload a valid image file.'
+                });
+            }
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+                const compressed = await compressImage(reader.result);
+                setSettings({ ...settings, pfpUrl: compressed });
+                triggerAlert({
+                    type: 'success',
+                    title: 'Image Loaded',
+                    message: 'Your new profile picture has been loaded. Don\'t forget to save changes!'
+                });
+            };
+            reader.readAsDataURL(file);
         }
     };
 
+    const startCamera = async () => {
+        setShowCamera(true);
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+            }
+        } catch (err) {
+            triggerAlert({
+                type: 'error',
+                title: 'Camera Access Denied',
+                message: 'Could not access your camera. Please check your browser permissions.'
+            });
+            setShowCamera(false);
+        }
+    };
+
+    const stopCamera = () => {
+        if (videoRef.current?.srcObject) {
+            const tracks = videoRef.current.srcObject.getTracks();
+            tracks.forEach(track => track.stop());
+        }
+        setShowCamera(false);
+    };
+
+    const capturePhoto = async () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = videoRef.current.videoWidth;
+        canvas.height = videoRef.current.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(videoRef.current, 0, 0);
+        const dataUri = canvas.toDataURL('image/jpeg');
+        const compressed = await compressImage(dataUri);
+        setSettings({ ...settings, pfpUrl: compressed });
+        stopCamera();
+        triggerAlert({
+            type: 'success',
+            title: 'Photo Captured',
+            message: 'Your photo has been set as your new profile picture. Remember to save account changes!'
+        });
+    };
+
+    const validatePfpUrl = (url) => {
+        if (!url) return true;
+        const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov'];
+        const lowerUrl = url.toLowerCase();
+        if (videoExtensions.some(ext => lowerUrl.endsWith(ext))) {
+            triggerAlert({
+                type: 'error',
+                title: 'Invalid URL',
+                message: 'Profile pictures must be static images. Video links are not allowed.'
+            });
+            return false;
+        }
+        return true;
+    };
+
+    const handleUpdateSettingsWithValidation = async (updatedFields = null) => {
+        const data = updatedFields || settings;
+        if (!validatePfpUrl(data.pfpUrl)) return;
+        handleUpdateSettings(data);
+    };
 
     if (loading) return <div style={{ textAlign: 'center', padding: '50px' }}>Loading...</div>;
 
@@ -128,6 +375,20 @@ export default function Settings() {
                 <div style={{ flex: 1, minWidth: '300px' }}>
                     <TiltedGlassCard style={{ padding: '30px' }}>
                         
+                        {showCamera && (
+                            <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div style={{ background: '#1F2937', padding: '20px', borderRadius: '20px', position: 'relative', maxWidth: '90%' }}>
+                                    <button onClick={stopCamera} style={{ position: 'absolute', top: -15, right: -15, background: '#FF2E63', border: 'none', color: 'white', width: 30, height: 30, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <X size={20} />
+                                    </button>
+                                    <video ref={videoRef} autoPlay playsInline style={{ width: '100%', maxWidth: '500px', borderRadius: '12px', background: '#000' }} />
+                                    <button onClick={capturePhoto} className="btn-primary" style={{ width: '100%', marginTop: '20px' }}>
+                                        Capture Frame
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
                         {activeTab === 'account' && (
                             <div>
                                 <h3 style={{ marginBottom: '20px' }}>Account Details</h3>
@@ -140,13 +401,49 @@ export default function Settings() {
                                         )}
                                     </div>
                                     <div style={{ flex: 1 }}>
-                                        <label style={{ display: 'block', fontSize: '0.8em', opacity: 0.7, marginBottom: '5px' }}>PFP URL</label>
-                                        <input 
-                                            type="text" 
-                                            value={settings.pfpUrl || ''} 
-                                            onChange={e => setSettings({...settings, pfpUrl: e.target.value})}
-                                            placeholder="https://example.com/photo.jpg"
-                                        />
+                                        <label style={{ display: 'block', fontSize: '0.8em', opacity: 0.7, marginBottom: '5px' }}>Profile Picture</label>
+                                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                            <button 
+                                                onClick={() => fileInputRef.current.click()} 
+                                                style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
+                                            >
+                                                <Upload size={16} /> Upload
+                                            </button>
+                                            <button 
+                                                onClick={startCamera} 
+                                                style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
+                                            >
+                                                <Camera size={16} /> Capture
+                                            </button>
+                                            <input 
+                                                type="text" 
+                                                value={settings.pfpUrl?.startsWith('data:') ? 'Local Image (Compressed)' : (settings.pfpUrl || '')} 
+                                                onChange={e => {
+                                                    const val = e.target.value;
+                                                    if (!val.startsWith('Local Image')) {
+                                                        setSettings({...settings, pfpUrl: val});
+                                                    }
+                                                }}
+                                                placeholder="Or paste URL (no videos)"
+                                                style={{ flex: 1, minWidth: '200px', margin: 0, color: settings.pfpUrl?.startsWith('data:') ? 'var(--accent-color)' : 'white' }}
+                                                readOnly={settings.pfpUrl?.startsWith('data:')}
+                                            />
+                                            {settings.pfpUrl?.startsWith('data:') && (
+                                                <button 
+                                                    onClick={() => setSettings({...settings, pfpUrl: ''})}
+                                                    style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid #EF4444', color: 'white', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer' }}
+                                                >
+                                                    Clear
+                                                </button>
+                                            )}
+                                            <input 
+                                                type="file" 
+                                                ref={fileInputRef} 
+                                                style={{ display: 'none' }} 
+                                                onChange={handleFileUpload} 
+                                                accept="image/*" 
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -166,7 +463,7 @@ export default function Settings() {
                                     <label htmlFor="gamify">Enable Gamification (Streaks & Badges)</label>
                                 </div>
 
-                                <button onClick={handleUpdateSettings} className="btn-primary" style={{ width: '100%' }}>
+                                <button onClick={() => handleUpdateSettingsWithValidation()} className="btn-primary" style={{ width: '100%' }}>
                                     <Save size={18} style={{ marginRight: 8 }} /> Save Account Changes
                                 </button>
 
@@ -231,36 +528,109 @@ export default function Settings() {
                         )}
 
                         {activeTab === 'security' && (
-                            <div>
-                                <h3 style={{ marginBottom: '20px' }}>Security</h3>
-                                <form onSubmit={handlePasswordChange}>
-                                    <div style={{ marginBottom: '15px' }}>
-                                        <label style={{ display: 'block', fontSize: '0.8em', opacity: 0.7, marginBottom: '5px' }}>Current Password</label>
-                                        <input type="password" value={passwords.current} onChange={e => setPasswords({...passwords, current: e.target.value})} required />
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                <h3 style={{ marginBottom: '5px' }}>Security & Authorization</h3>
+                                
+                                {/* Last Login Widget */}
+                                <div style={{ 
+                                    padding: '20px', 
+                                    background: 'rgba(255,255,255,0.05)', 
+                                    borderRadius: '16px', 
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '15px'
+                                }}>
+                                    <div style={{ 
+                                        width: '45px', 
+                                        height: '45px', 
+                                        borderRadius: '12px', 
+                                        background: 'rgba(var(--accent-color-rgb), 0.2)', 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center' 
+                                    }}>
+                                        <Clock size={24} color="var(--accent-color)" />
                                     </div>
-                                    <div style={{ display: 'flex', gap: '15px' }}>
-                                        <div style={{ flex: 1 }}>
-                                            <label style={{ display: 'block', fontSize: '0.8em', opacity: 0.7, marginBottom: '5px' }}>New Password</label>
-                                            <input type="password" value={passwords.next} onChange={e => setPasswords({...passwords, next: e.target.value})} required />
-                                        </div>
-                                        <div style={{ flex: 1 }}>
-                                            <label style={{ display: 'block', fontSize: '0.8em', opacity: 0.7, marginBottom: '5px' }}>Confirm New</label>
-                                            <input type="password" value={passwords.confirm} onChange={e => setPasswords({...passwords, confirm: e.target.value})} required />
+                                    <div>
+                                        <div style={{ fontSize: '0.8em', opacity: 0.6 }}>Last Login Activity</div>
+                                        <div style={{ fontWeight: 'bold' }}>
+                                            {lastLogin ? new Date(lastLogin).toLocaleString() : 'First time login'}
                                         </div>
                                     </div>
-                                    <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '10px' }}>
-                                        <Key size={18} style={{ marginRight: 8 }} /> Update Password
-                                    </button>
-                                </form>
+                                </div>
 
-                                <div style={{ marginTop: '40px', padding: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <div>
-                                            <div style={{ fontWeight: 'bold' }}>Two-Step Verification</div>
-                                            <div style={{ fontSize: '0.8em', opacity: 0.6 }}>Add an extra layer of security.</div>
-                                        </div>
-                                        <button disabled style={{ padding: '8px 15px', borderRadius: '8px', border: 'none', background: 'rgba(255,255,255,0.1)', color: 'white' }}>Manage</button>
+                                {/* Password Update Card */}
+                                <div style={{ 
+                                    padding: '20px', 
+                                    background: 'rgba(255,255,255,0.05)', 
+                                    borderRadius: '16px', 
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center'
+                                }}>
+                                    <div>
+                                        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Account Password</div>
+                                        <div style={{ fontSize: '0.8em', opacity: 0.6 }}>Change your password to keep your account safe.</div>
                                     </div>
+                                    <button 
+                                        onClick={() => setSecurityModal('verify')}
+                                        className="btn-primary" 
+                                        style={{ padding: '10px 20px', fontSize: '0.9em' }}
+                                    >
+                                        Update Password
+                                    </button>
+                                </div>
+
+                                {/* App Lock Card */}
+                                <div style={{ 
+                                    padding: '20px', 
+                                    background: 'rgba(255,255,255,0.05)', 
+                                    borderRadius: '16px', 
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center'
+                                }}>
+                                    <div>
+                                        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Internal App Lock</div>
+                                        <div style={{ fontSize: '0.8em', opacity: 0.6 }}>Set a PIN to lock the diary when not in use.</div>
+                                    </div>
+                                    <button 
+                                        onClick={() => setSecurityModal('app-lock')}
+                                        style={{ 
+                                            background: 'rgba(255,255,255,0.1)', 
+                                            border: 'none', 
+                                            color: 'white', 
+                                            padding: '10px 20px', 
+                                            borderRadius: '12px',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px'
+                                        }}
+                                    >
+                                        <Lock size={16} /> Configure PIN
+                                    </button>
+                                </div>
+
+                                {/* 2FA Placeholder (Restyled) */}
+                                <div style={{ 
+                                    padding: '20px', 
+                                    background: 'rgba(255,255,255,0.02)', 
+                                    borderRadius: '16px', 
+                                    border: '1px solid rgba(255,255,255,0.05)',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    opacity: 0.6
+                                }}>
+                                    <div>
+                                        <div style={{ fontWeight: 'bold' }}>Two-Step Verification</div>
+                                        <div style={{ fontSize: '0.8em' }}>Coming soon: Mobile or email verification.</div>
+                                    </div>
+                                    <Shield size={20} />
                                 </div>
                             </div>
                         )}
@@ -270,57 +640,75 @@ export default function Settings() {
                                 <h3 style={{ marginBottom: '20px' }}>Personalize Theme</h3>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '15px' }}>
                                     {Object.entries(themes).map(([key, t]) => (
-                                        <div 
+                                        <button 
                                             key={key} 
+                                            type="button"
+                                            onMouseDown={() => { 
+                                                console.log("Theme mousedown:", key);
+                                                setTheme(key); 
+                                            }}
                                             onClick={() => { 
+                                                console.log("Theme clicked:", key);
                                                 const newSettings = { ...settings, themePreference: key };
                                                 setSettings(newSettings);
                                                 setTheme(key);
                                                 handleUpdateSettings(newSettings);
                                             }}
                                             style={{
-                                                padding: '15px',
-                                                borderRadius: '15px',
+                                                padding: '20px',
+                                                borderRadius: '20px',
                                                 background: t.bg,
-                                                border: `3px solid ${theme === key ? t.accent : 'transparent'}`,
+                                                border: `4px solid ${theme === key ? t.accent : 'rgba(255,255,255,0.05)'}`,
                                                 cursor: 'pointer',
                                                 textAlign: 'center',
-                                                transition: 'transform 0.2s'
+                                                transition: 'all 0.2s',
+                                                display: 'block',
+                                                width: '100%',
+                                                boxSizing: 'border-box',
+                                                position: 'relative',
+                                                zIndex: 100,
+                                                pointerEvents: 'auto'
                                             }}
                                             onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-5px)'}
                                             onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                                            aria-label={`Select ${t.name} theme`}
                                         >
-                                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: t.accent, margin: '0 auto 10px' }}></div>
-                                            <div style={{ color: t.text, fontSize: '0.8em', fontWeight: 'bold' }}>{t.name}</div>
-                                        </div>
+                                            <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: t.accent, margin: '0 auto 15px', pointerEvents: 'none', boxShadow: `0 0 20px ${t.accent}44` }}></div>
+                                            <div style={{ color: t.text, fontSize: '0.9em', fontWeight: 'bold', pointerEvents: 'none' }}>{t.name}</div>
+                                        </button>
                                     ))}
                                 </div>
 
                                 <h3 style={{ marginTop: '40px', marginBottom: '20px' }}>Seasonal Effects</h3>
-                                <div style={{ display: 'flex', gap: '15px' }}>
+                                <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
                                     {[
-                                        { id: 'winter', name: 'Winter / Christmas', icon: '❄️' },
-                                        { id: 'summer', name: 'Summer Vibes', icon: '☀️' }
+                                        { id: 'winter', label: 'Winter / Christmas', icon: '❄️' },
+                                        { id: 'summer', label: 'Summer', icon: '☀️' },
+                                        { id: 'spring', label: 'Spring', icon: '🌱' },
+                                        { id: 'autumn', label: 'Autumn', icon: '🍁' }
                                     ].map(s => (
-                                        <button
+                                        <button 
                                             key={s.id}
-                                            onClick={() => setSeason(s.id)}
-                                            style={{
+                                            onClick={() => setSeason(s.id)} 
+                                            style={{ 
                                                 flex: 1,
-                                                padding: '20px',
-                                                borderRadius: '15px',
-                                                background: season === s.id ? 'var(--accent-color)' : 'rgba(255,255,255,0.05)',
-                                                border: 'none',
-                                                color: 'white',
+                                                minWidth: '120px',
+                                                background: season === s.id ? 'var(--accent-color)' : 'rgba(255,255,255,0.05)', 
+                                                border: 'none', 
+                                                color: 'white', 
+                                                padding: '15px', 
+                                                borderRadius: '12px', 
                                                 cursor: 'pointer',
+                                                transition: 'all 0.2s',
                                                 display: 'flex',
                                                 flexDirection: 'column',
                                                 alignItems: 'center',
-                                                gap: '10px'
+                                                gap: '8px',
+                                                fontWeight: 'bold'
                                             }}
                                         >
-                                            <span style={{ fontSize: '2rem' }}>{s.icon}</span>
-                                            <span style={{ fontWeight: 'bold' }}>{s.name}</span>
+                                            <span style={{ fontSize: '1.5rem' }}>{s.icon}</span>
+                                            <span>{s.label}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -330,6 +718,119 @@ export default function Settings() {
                     </TiltedGlassCard>
                 </div>
             </div>
+            {securityModal && (
+                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(10px)', zIndex: 9000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+                    <TiltedGlassCard style={{ maxWidth: '450px', width: '100%', padding: '30px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                            <h3 style={{ margin: 0 }}>
+                                {securityModal === 'verify' && 'Verify Identity'}
+                                {securityModal === 'update' && 'Set New Password'}
+                                {securityModal === 'app-lock' && 'App Lock PIN'}
+                            </h3>
+                            <button onClick={() => setSecurityModal(null)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        {securityModal === 'verify' && (
+                            <form onSubmit={handleVerifyPassword}>
+                                <p style={{ fontSize: '0.9em', opacity: 0.7, marginBottom: '20px' }}>Please enter your current password to proceed with sensitive changes.</p>
+                                <div style={{ position: 'relative', marginBottom: '20px' }}>
+                                    <input 
+                                        type={showPasswords.current ? 'text' : 'password'} 
+                                        placeholder="Current Password" 
+                                        value={passwordData.current}
+                                        onChange={e => setPasswordData({...passwordData, current: e.target.value})}
+                                        style={{ width: '100%', paddingRight: '45px' }}
+                                        required 
+                                    />
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShowPasswords({...showPasswords, current: !showPasswords.current})}
+                                        style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'gray', cursor: 'pointer', zIndex: 10 }}
+                                    >
+                                        {showPasswords.current ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
+                                <button type="submit" className="btn-primary" style={{ width: '100%' }}>Continue</button>
+                            </form>
+                        )}
+
+                        {securityModal === 'update' && (
+                            <form onSubmit={handleFinalUpdatePassword}>
+                                <p style={{ fontSize: '0.9em', opacity: 0.7, marginBottom: '20px' }}>Choose a strong new password for your account.</p>
+                                
+                                <div style={{ position: 'relative', marginBottom: '15px' }}>
+                                    <input 
+                                        type={showPasswords.next ? 'text' : 'password'} 
+                                        placeholder="New Password" 
+                                        value={passwordData.next}
+                                        onChange={e => setPasswordData({...passwordData, next: e.target.value})}
+                                        style={{ width: '100%', paddingRight: '45px' }}
+                                        required 
+                                    />
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShowPasswords({...showPasswords, next: !showPasswords.next})}
+                                        style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'gray', cursor: 'pointer', zIndex: 10 }}
+                                    >
+                                        {showPasswords.next ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
+
+                                <div style={{ position: 'relative', marginBottom: '25px' }}>
+                                    <input 
+                                        type={showPasswords.confirm ? 'text' : 'password'} 
+                                        placeholder="Confirm New Password" 
+                                        value={passwordData.confirm}
+                                        onChange={e => setPasswordData({...passwordData, confirm: e.target.value})}
+                                        style={{ width: '100%', paddingRight: '45px' }}
+                                        required 
+                                    />
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShowPasswords({...showPasswords, confirm: !showPasswords.confirm})}
+                                        style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'gray', cursor: 'pointer', zIndex: 10 }}
+                                    >
+                                        {showPasswords.confirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
+
+                                <button type="submit" className="btn-primary" style={{ width: '100%' }}>Update Password</button>
+                            </form>
+                        )}
+
+                        {securityModal === 'app-lock' && (
+                            <form onSubmit={handleUpdateAppLock}>
+                                <p style={{ fontSize: '0.9em', opacity: 0.7, marginBottom: '20px' }}>Set a 4-digit PIN to lock the app. Leave empty to disable.</p>
+                                <div style={{ position: 'relative', marginBottom: '25px' }}>
+                                    <input 
+                                        type={showPasswords.pin ? 'text' : 'password'} 
+                                        placeholder="Enter PIN" 
+                                        maxLength={4}
+                                        value={pin}
+                                        onChange={e => setPin(e.target.value.replace(/\D/g, ''))}
+                                        style={{ width: '100%', paddingRight: '45px', textAlign: 'center', fontSize: '1.5em', letterSpacing: '0.5em' }}
+                                    />
+                                    <button 
+                                        type="button"
+                                        onClick={() => setShowPasswords({...showPasswords, pin: !showPasswords.pin})}
+                                        style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'gray', cursor: 'pointer', zIndex: 10 }}
+                                    >
+                                        {showPasswords.pin ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
+                                <button type="submit" className="btn-primary" style={{ width: '100%' }}>{pin ? 'Enable App Lock' : 'Disable App Lock'}</button>
+                            </form>
+                        )}
+                    </TiltedGlassCard>
+                </div>
+            )}
+
+            <CustomAlert 
+                {...alertConfig} 
+                onClose={() => setAlertConfig(prev => ({ ...prev, isOpen: false }))} 
+            />
         </div>
     );
 }
