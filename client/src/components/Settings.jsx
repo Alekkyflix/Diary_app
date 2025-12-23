@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../api';
 import { User, Shield, Eye, EyeOff, Palette, Trash2, Save, Key, Camera, Upload, X, Clock, Lock } from 'lucide-react';
 
@@ -369,6 +370,25 @@ export default function Settings() {
                             {tab.icon} {tab.label}
                         </button>
                     ))}
+
+                    <Link
+                        to="/history"
+                        style={{
+                            background: 'rgba(255,255,255,0.05)',
+                            color: 'white',
+                            border: '1px solid var(--accent-color)',
+                            padding: '12px 20px',
+                            borderRadius: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            transition: 'all 0.2s',
+                            textDecoration: 'none',
+                            marginTop: '20px'
+                        }}
+                    >
+                        <Clock size={18} color="var(--accent-color)" /> Diary History
+                    </Link>
                 </div>
 
                 {/* Main Content Area */}

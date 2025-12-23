@@ -731,7 +731,9 @@ sequelize.sync().then(async () => {
     const missingColumns = [
         { name: 'googleId', type: 'VARCHAR(255)' },
         { name: 'githubId', type: 'VARCHAR(255)' },
-        { name: 'microsoftId', type: 'VARCHAR(100)' } // Re-using existing or similar
+        { name: 'microsoftId', type: 'VARCHAR(100)' },
+        { name: 'lastLogin', type: 'DATETIME' },
+        { name: 'appLockPin', type: 'VARCHAR(255)' }
     ];
 
     for (const col of missingColumns) {

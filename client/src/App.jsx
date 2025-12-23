@@ -21,6 +21,7 @@ import CustomCursor from './components/CustomCursor';
 import CursorToggle from './components/CursorToggle';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import AppLockOverlay from './components/AppLockOverlay';
+import History from './components/History';
 
 function AppContent() {
   const { season, setTheme } = useTheme();
@@ -66,6 +67,7 @@ function AppContent() {
           <Route path="/groups/:id" element={isAuthenticated ? <GroupChat /> : <Navigate to="/login" />} />
           <Route path="/support" element={isAuthenticated ? <SupportPage /> : <Navigate to="/login" />} />
           <Route path="/settings" element={isAuthenticated ? <Settings /> : <Navigate to="/login" />} />
+          <Route path="/history" element={isAuthenticated ? <History /> : <Navigate to="/login" />} />
         </Route>
       </Routes>
       <CustomCursor />
