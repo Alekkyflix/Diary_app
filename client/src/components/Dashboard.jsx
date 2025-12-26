@@ -54,11 +54,11 @@ export default function Dashboard() {
                             width: '60px', 
                             height: '60px', 
                             borderRadius: '50%', 
-                            background: 'rgba(255,255,255,0.1)', 
+                            background: 'var(--glass-bg)', 
                             display: 'flex', 
                             alignItems: 'center', 
                             justifyContent: 'center',
-                            border: '1px solid rgba(255,255,255,0.2)'
+                            border: '1px solid var(--glass-border)'
                         }}>
                             <Smile size={30} color="var(--accent-color)" />
                         </div>
@@ -148,7 +148,8 @@ export default function Dashboard() {
                                     {new Date(entry.createdAt).toLocaleDateString()}
                                 </span>
                                 <p style={{
-                                    color: 'rgba(255,255,255,0.7)',
+                                    color: 'var(--text-primary)',
+                                    opacity: 0.8,
                                     lineHeight: '1.5',
                                     display: '-webkit-box',
                                     WebkitLineClamp: 3,

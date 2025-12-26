@@ -172,7 +172,7 @@ export default function EntryEditor() {
             )}
 
             <div style={{ marginBottom: '20px' }}>
-                <button onClick={handleBack} style={{ background: 'none', border: 'none', color: 'white', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', padding: 0 }}>
+                <button onClick={handleBack} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', padding: 0 }}>
                     <ArrowLeft size={16} /> Back
                 </button>
             </div>
@@ -182,14 +182,14 @@ export default function EntryEditor() {
                 placeholder="Title of your day..."
                 value={title}
                 onChange={e => { setTitle(e.target.value); setIsSaved(false); }}
-                style={{ fontSize: '1.5em', fontWeight: 'bold', background: 'transparent', border: 'none', borderBottom: '1px solid var(--glass-border)', paddingLeft: 0, color: 'white' }}
+                style={{ fontSize: '1.5em', fontWeight: 'bold', background: 'transparent', border: 'none', borderBottom: '1px solid var(--glass-border)', paddingLeft: 0, color: 'var(--text-primary)' }}
             />
 
             <div style={{ margin: '20px 0', display: 'flex', alignItems: 'center', gap: '20px' }}>
                 <button onClick={() => setShowRecorder(true)} className="btn-icon" style={{
-                    background: audioBlob ? 'rgba(8, 217, 214, 0.2)' : 'rgba(255,255,255,0.1)',
+                    background: audioBlob ? 'rgba(8, 217, 214, 0.2)' : 'var(--glass-bg)',
                     border: 'none',
-                    width: 40, height: 40, borderRadius: '50%', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    width: 40, height: 40, borderRadius: '50%', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}>
                     {audioBlob ? <Volume2 size={20} color="#08D9D6" /> : <Mic size={20} />}
                 </button>
@@ -232,11 +232,11 @@ export default function EntryEditor() {
                 placeholder="Start writing..."
                 value={content}
                 onChange={e => { setContent(e.target.value); setIsSaved(false); }}
-                style={{ flex: 1, resize: 'none', fontSize: '1.1em', lineHeight: '1.6', background: 'transparent', border: 'none', color: 'white' }}
+                style={{ flex: 1, resize: 'none', fontSize: '1.1em', lineHeight: '1.6', background: 'transparent', border: 'none', color: 'var(--text-primary)' }}
             ></textarea>
 
             {visibility === 'public' && (
-                <div style={{ fontSize: '0.8em', opacity: 0.7, textAlign: 'right', color: wordCount > 20 ? '#FF5F56' : 'white' }}>
+                <div style={{ fontSize: '0.8em', opacity: 0.7, textAlign: 'right', color: wordCount > 20 ? '#FF5F56' : 'var(--text-primary)' }}>
                     {wordCount} / 20 words
                 </div>
             )}
@@ -246,8 +246,8 @@ export default function EntryEditor() {
                     value={visibility}
                     onChange={e => setVisibility(e.target.value)}
                     style={{
-                        background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
-                        color: 'white', padding: '10px', borderRadius: '8px', outline: 'none'
+                        background: 'var(--glass-bg)', border: '1px solid var(--glass-border)',
+                        color: 'var(--text-primary)', padding: '10px', borderRadius: '8px', outline: 'none'
                     }}
                 >
                     <option value="private" style={{ color: 'black' }}>🔒 Private (Don't Share)</option>

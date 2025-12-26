@@ -136,7 +136,8 @@ export default function History() {
                     </div>
                 ) : (
                     <p style={{ 
-                        color: 'rgba(255,255,255,0.7)', 
+                        color: 'var(--text-primary)', 
+                        opacity: 0.8,
                         fontSize: '0.95em', 
                         lineHeight: '1.6',
                         overflow: 'hidden',
@@ -158,14 +159,14 @@ export default function History() {
         ));
     };
 
-    if (loading) return <div style={{ color: 'white', padding: '100px', textAlign: 'center' }}>Loading your history...</div>;
+    if (loading) return <div style={{ color: 'var(--text-primary)', padding: '100px', textAlign: 'center' }}>Loading your history...</div>;
 
     return (
-        <div style={{ maxWidth: '1000px', margin: '0 auto', color: 'white', paddingBottom: '50px' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto', color: 'var(--text-primary)', paddingBottom: '50px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '30px' }}>
                 <button 
                     onClick={() => navigate(-1)} 
-                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', width: 40, height: 40, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    style={{ background: 'var(--glass-bg)', border: 'none', color: 'var(--text-primary)', width: 40, height: 40, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 >
                     <ArrowLeft size={20} />
                 </button>
@@ -180,10 +181,10 @@ export default function History() {
                 marginBottom: '40px', 
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                background: 'rgba(255,255,255,0.03)',
+                background: 'var(--glass-bg)',
                 padding: '20px',
                 borderRadius: '24px',
-                border: '1px solid rgba(255,255,255,0.05)'
+                border: '1px solid var(--glass-border)'
             }}>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                     {tabs.map(tab => (
@@ -192,7 +193,7 @@ export default function History() {
                             onClick={() => setFilter(tab.id)}
                             style={{
                                 background: filter === tab.id ? 'var(--accent-color)' : 'rgba(255,255,255,0.05)',
-                                color: 'white',
+                                color: filter === tab.id ? 'white' : 'var(--text-primary)',
                                 border: 'none',
                                 padding: '10px 18px',
                                 borderRadius: '12px',
@@ -222,7 +223,7 @@ export default function History() {
                             background: 'rgba(255,255,255,0.05)', 
                             border: '1px solid rgba(255,255,255,0.1)',
                             borderRadius: '12px',
-                            color: 'white',
+                            color: 'var(--text-primary)',
                             outline: 'none'
                         }}
                     />

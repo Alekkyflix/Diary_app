@@ -37,17 +37,17 @@ export default function Layout() {
                 </div>
 
                 <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-                    <button onClick={() => navigate('/')} title="Dashboard" style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: 5 }}>
+                    <button onClick={() => navigate('/')} title="Dashboard" style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', padding: 5 }}>
                         <LayoutDashboard size={20} />
                     </button>
-                    <button onClick={() => navigate('/social')} title="Social Hub" style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: 5 }}>
+                    <button onClick={() => navigate('/social')} title="Social Hub" style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', padding: 5 }}>
                         <Share2 size={20} />
                     </button>
-                    <button onClick={() => navigate('/support')} title="Support" style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: 5 }}>
+                    <button onClick={() => navigate('/support')} title="Support" style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', padding: 5 }}>
                         <HelpCircle size={20} />
                     </button>
                     <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.1)' }}></div>
-                    <button onClick={() => navigate('/settings')} title="Settings" style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: 5 }}>
+                    <button onClick={() => navigate('/settings')} title="Settings" style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', padding: 5 }}>
                         <Settings size={20} />
                     </button>
                     <button onClick={handleLogout} title="Logout" style={{ background: 'none', border: 'none', color: 'var(--accent-color)', cursor: 'pointer', padding: 5 }}>
