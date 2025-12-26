@@ -327,7 +327,7 @@ export default function Settings() {
     if (loading) return <div style={{ textAlign: 'center', padding: '50px' }}>Loading...</div>;
 
     return (
-        <div style={{ maxWidth: '800px', margin: '0 auto', color: 'white', position: 'relative', zIndex: 10 }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto', color: 'var(--text-primary)', position: 'relative', zIndex: 10 }}>
             <h1 style={{ marginBottom: '30px' }}>Settings</h1>
 
             {message.text && (
@@ -355,16 +355,17 @@ export default function Settings() {
                             key={tab.id}
                             onClick={() => { setActiveTab(tab.id); setMessage({ type: '', text: '' }); }}
                             style={{
-                                background: activeTab === tab.id ? 'var(--accent-color)' : 'rgba(255,255,255,0.05)',
-                                color: 'white',
-                                border: 'none',
+                                background: activeTab === tab.id ? 'var(--accent-color)' : 'var(--glass-bg)',
+                                color: activeTab === tab.id ? 'var(--btn-text)' : 'var(--text-primary)',
+                                border: activeTab === tab.id ? 'none' : '1px solid var(--glass-border)',
                                 padding: '12px 20px',
                                 borderRadius: '12px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '10px',
                                 transition: 'all 0.2s',
-                                textAlign: 'left'
+                                textAlign: 'left',
+                                cursor: 'pointer'
                             }}
                         >
                             {tab.icon} {tab.label}
@@ -374,9 +375,9 @@ export default function Settings() {
                     <Link
                         to="/history"
                         style={{
-                            background: 'rgba(255,255,255,0.05)',
-                            color: 'white',
-                            border: '1px solid var(--accent-color)',
+                            background: 'var(--glass-bg)',
+                            color: 'var(--text-primary)',
+                            border: '1px solid var(--glass-border)',
                             padding: '12px 20px',
                             borderRadius: '12px',
                             display: 'flex',
@@ -398,7 +399,7 @@ export default function Settings() {
                         {showCamera && (
                             <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <div style={{ background: '#1F2937', padding: '20px', borderRadius: '20px', position: 'relative', maxWidth: '90%' }}>
-                                    <button onClick={stopCamera} style={{ position: 'absolute', top: -15, right: -15, background: '#FF2E63', border: 'none', color: 'white', width: 30, height: 30, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <button onClick={stopCamera} style={{ position: 'absolute', top: -15, right: -15, background: 'var(--accent-color)', border: 'none', color: 'var(--btn-text)', width: 30, height: 30, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                         <X size={20} />
                                     </button>
                                     <video ref={videoRef} autoPlay playsInline style={{ width: '100%', maxWidth: '500px', borderRadius: '12px', background: '#000' }} />
@@ -413,7 +414,7 @@ export default function Settings() {
                             <div>
                                 <h3 style={{ marginBottom: '20px' }}>Account Details</h3>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '25px' }}>
-                                    <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+                                    <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', overflow: 'hidden' }}>
                                         {settings.pfpUrl ? (
                                             <img src={settings.pfpUrl} alt="PFP" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         ) : (
@@ -425,13 +426,13 @@ export default function Settings() {
                                         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                                             <button 
                                                 onClick={() => fileInputRef.current.click()} 
-                                                style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
+                                                style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
                                             >
                                                 <Upload size={16} /> Upload
                                             </button>
                                             <button 
                                                 onClick={startCamera} 
-                                                style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
+                                                style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
                                             >
                                                 <Camera size={16} /> Capture
                                             </button>
@@ -445,7 +446,7 @@ export default function Settings() {
                                                     }
                                                 }}
                                                 placeholder="Or paste URL (no videos)"
-                                                style={{ flex: 1, minWidth: '200px', margin: 0, color: settings.pfpUrl?.startsWith('data:') ? 'var(--accent-color)' : 'white' }}
+                                                style={{ flex: 1, minWidth: '200px', margin: 0, color: settings.pfpUrl?.startsWith('data:') ? 'var(--accent-color)' : 'var(--text-primary)' }}
                                                 readOnly={settings.pfpUrl?.startsWith('data:')}
                                             />
                                             {settings.pfpUrl?.startsWith('data:') && (
@@ -554,9 +555,9 @@ export default function Settings() {
                                 {/* Last Login Widget */}
                                 <div style={{ 
                                     padding: '20px', 
-                                    background: 'rgba(255,255,255,0.05)', 
+                                    background: 'var(--glass-bg)', 
                                     borderRadius: '16px', 
-                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    border: '1px solid var(--glass-border)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '15px'
@@ -583,9 +584,9 @@ export default function Settings() {
                                 {/* Password Update Card */}
                                 <div style={{ 
                                     padding: '20px', 
-                                    background: 'rgba(255,255,255,0.05)', 
+                                    background: 'var(--glass-bg)', 
                                     borderRadius: '16px', 
-                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    border: '1px solid var(--glass-border)',
                                     display: 'flex',
                                     justifyContent: 'space-between',
                                     alignItems: 'center'
@@ -620,9 +621,9 @@ export default function Settings() {
                                     <button 
                                         onClick={() => setSecurityModal('app-lock')}
                                         style={{ 
-                                            background: 'rgba(255,255,255,0.1)', 
-                                            border: 'none', 
-                                            color: 'white', 
+                                            background: 'var(--glass-bg)', 
+                                            border: '1px solid var(--glass-border)', 
+                                            color: 'var(--text-primary)', 
                                             padding: '10px 20px', 
                                             borderRadius: '12px',
                                             cursor: 'pointer',
@@ -678,7 +679,7 @@ export default function Settings() {
                                                 padding: '20px',
                                                 borderRadius: '20px',
                                                 background: t.bg,
-                                                border: `4px solid ${theme === key ? t.accent : 'rgba(255,255,255,0.05)'}`,
+                                                border: `3px solid ${theme === key ? t.accent : 'var(--glass-border)'}`,
                                                 cursor: 'pointer',
                                                 textAlign: 'center',
                                                 transition: 'all 0.2s',
@@ -713,9 +714,9 @@ export default function Settings() {
                                             style={{ 
                                                 flex: 1,
                                                 minWidth: '120px',
-                                                background: season === s.id ? 'var(--accent-color)' : 'rgba(255,255,255,0.05)', 
-                                                border: 'none', 
-                                                color: 'white', 
+                                                background: season === s.id ? 'var(--accent-color)' : 'var(--glass-bg)', 
+                                                border: season === s.id ? 'none' : '1px solid var(--glass-border)', 
+                                                color: season === s.id ? 'var(--btn-text)' : 'var(--text-primary)', 
                                                 padding: '15px', 
                                                 borderRadius: '12px', 
                                                 cursor: 'pointer',
@@ -747,7 +748,7 @@ export default function Settings() {
                                 {securityModal === 'update' && 'Set New Password'}
                                 {securityModal === 'app-lock' && 'App Lock PIN'}
                             </h3>
-                            <button onClick={() => setSecurityModal(null)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
+                            <button onClick={() => setSecurityModal(null)} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer' }}>
                                 <X size={24} />
                             </button>
                         </div>

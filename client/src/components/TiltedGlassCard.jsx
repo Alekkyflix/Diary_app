@@ -64,7 +64,7 @@ export default function TiltedGlassCard({ children, className = "", style = {} }
                     position: 'absolute',
                     top: 0, left: 0, right: 0, bottom: 0,
                     borderRadius: '24px',
-                    background: 'linear-gradient(125deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 60%)',
+                    background: 'linear-gradient(125deg, var(--glass-highlight) 0%, rgba(255,255,255,0) 60%)',
                     opacity: 0,
                     zIndex: 1,
                     pointerEvents: 'none',

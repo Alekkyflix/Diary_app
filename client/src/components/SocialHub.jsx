@@ -56,7 +56,7 @@ export default function SocialHub() {
 
 
     return (
-        <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto', color: 'white', position: 'relative', zIndex: 10 }}>
+        <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto', color: 'var(--text-primary)', position: 'relative', zIndex: 10 }}>
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
                 <div>
@@ -69,10 +69,10 @@ export default function SocialHub() {
                     <button className="btn-primary" onClick={() => setView('create')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Plus size={18} /> New Circle
                     </button>
-                    <button className="btn-secondary" onClick={() => setView('join')} style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '12px 24px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button className="btn-secondary" onClick={() => setView('join')} style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', padding: '12px 24px', borderRadius: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <UserPlus size={18} /> Join via Code
                     </button>
-                    <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <ArrowLeft size={18} /> Dashboard
                     </button>
                 </div>
@@ -91,11 +91,11 @@ export default function SocialHub() {
                         <textarea
                             placeholder="Description (Optional)" rows="3"
                             value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })}
-                            style={{ width: '100%', padding: '15px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', marginBottom: '15px' }}
+                            style={{ width: '100%', padding: '15px', borderRadius: '12px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', marginBottom: '15px' }}
                         />
                         <div style={{ display: 'flex', gap: '10px' }}>
                             <button type="submit" className="btn-primary" style={{ flex: 1 }}>Create</button>
-                            <button type="button" onClick={() => setView('list')} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '12px 24px', borderRadius: '12px', cursor: 'pointer' }}>Cancel</button>
+                            <button type="button" onClick={() => setView('list')} style={{ background: 'none', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', padding: '12px 24px', borderRadius: '12px', cursor: 'pointer' }}>Cancel</button>
                         </div>
                     </form>
                 </TiltedGlassCard>
@@ -113,7 +113,7 @@ export default function SocialHub() {
                         />
                         <div style={{ display: 'flex', gap: '10px' }}>
                             <button type="submit" className="btn-primary" style={{ flex: 1 }}>Join</button>
-                            <button type="button" onClick={() => setView('list')} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '12px 24px', borderRadius: '12px', cursor: 'pointer' }}>Cancel</button>
+                            <button type="button" onClick={() => setView('list')} style={{ background: 'none', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', padding: '12px 24px', borderRadius: '12px', cursor: 'pointer' }}>Cancel</button>
                         </div>
                     </form>
                 </TiltedGlassCard>

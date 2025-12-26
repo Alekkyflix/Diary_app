@@ -350,9 +350,9 @@ export default function SnapEditor({ onClose, onPosted }) {
     };
 
     return (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10000, background: 'black', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10000, background: 'var(--bg-color)', display: 'flex', flexDirection: 'column', color: 'var(--text-primary)' }}>
             {/* Header */}
-            <div style={{ padding: '15px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.5)', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ padding: '15px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--glass-bg)', borderBottom: '1px solid var(--glass-border)' }}>
                 <button onClick={() => { stopCameraStream(); onClose(); }} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer' }}><X /></button>
                 
                 <div style={{ display: 'flex', gap: '20px' }}>
@@ -366,7 +366,7 @@ export default function SnapEditor({ onClose, onPosted }) {
             </div>
 
             <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-                <div style={{ flex: 1, position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#0a0a0a' }}>
+                <div style={{ flex: 1, position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'rgba(0,0,0,0.2)' }}>
                     {!image && !isCameraOpen && (
                         <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
                             <button 
@@ -392,8 +392,8 @@ export default function SnapEditor({ onClose, onPosted }) {
                                     display: 'flex', 
                                     alignItems: 'center', 
                                     gap: '10px',
-                                    background: 'rgba(255,255,255,0.1)',
-                                    border: '1px solid rgba(255,255,255,0.2)'
+                                    background: 'var(--glass-bg)',
+                                    border: '1px solid var(--glass-border)'
                                 }}
                             >
                                 <ImageIcon size={24} />
@@ -523,7 +523,7 @@ export default function SnapEditor({ onClose, onPosted }) {
                     )}
                 </div>
 
-                <div style={{ width: '80px', background: 'rgba(0,0,0,0.8)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 0', gap: '25px', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
+                <div style={{ width: '80px', background: 'var(--glass-bg)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 0', gap: '25px', borderLeft: '1px solid var(--glass-border)' }}>
                     <div onClick={() => { setShowTextTools(!showTextTools); setShowStickers(false); setShowGifs(false); }} className="tool-btn"><Type color={showTextTools ? 'var(--accent-color)' : 'var(--text-primary)'}/></div>
                     <div onClick={() => { setShowStickers(!showStickers); setShowTextTools(false); setShowGifs(false); }} className="tool-btn"><Smile color={showStickers ? 'var(--accent-color)' : 'var(--text-primary)'}/></div>
                     <div onClick={() => { setShowGifs(!showGifs); setShowTextTools(false); setShowStickers(false); }} className="tool-btn"><Sparkles color={showGifs ? 'var(--accent-color)' : 'var(--text-primary)'}/></div>
@@ -537,8 +537,8 @@ export default function SnapEditor({ onClose, onPosted }) {
                 .tool-btn { cursor: pointer; opacity: 0.8; transition: 0.2s; }
                 .tool-btn:hover { opacity: 1; transform: scale(1.1); }
                 .control-btn { 
-                    background: rgba(255,255,255,0.05); 
-                    border: 1px solid rgba(255,255,255,0.1); 
+                    background: var(--glass-bg); 
+                    border: 1px solid var(--glass-border); 
                     color: var(--text-primary); 
                     padding: 8px; 
                     border-radius: 10px; 

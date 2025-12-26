@@ -87,12 +87,12 @@ export default function Login() {
     };
 
     return (
-        <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 10 }}>
+        <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 10, color: 'var(--text-primary)' }}>
             <TiltedGlassCard style={{ padding: '40px', width: '360px', textAlign: 'center' }}>
                 {step === 1 ? (
                     <>
                         <div style={{ background: 'var(--accent-color)', width: '60px', height: '60px', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-                            <Mail color="white" size={30} />
+                            <Mail color="var(--btn-text)" size={30} />
                         </div>
                         <h2 style={{ marginBottom: '10px' }}>Welcome Back</h2>
                         <p style={{ opacity: 0.6, fontSize: '0.9em', marginBottom: '30px' }}>Enter your identity to proceed</p>
@@ -119,15 +119,15 @@ export default function Login() {
                     <>
                         <button 
                             onClick={() => { setStep(1); setPassword(''); setError(''); }}
-                            style={{ position: 'absolute', top: '20px', left: '20px', background: 'none', border: 'none', color: 'white', opacity: 0.6 }}
+                            style={{ position: 'absolute', top: '20px', left: '20px', background: 'none', border: 'none', color: 'var(--text-primary)', opacity: 0.6, cursor: 'pointer' }}
                         >
                             <ArrowLeft size={20} />
                         </button>
                         
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '30px' }}>
                             <div style={{ position: 'relative' }}>
-                                <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>👤</div>
-                                <div style={{ position: 'absolute', bottom: 0, right: 0, background: '#10B981', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #1a1a1a' }}>
+                                <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>👤</div>
+                                <div style={{ position: 'absolute', bottom: 0, right: 0, background: '#10B981', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg-color)' }}>
                                     <CheckCircle2 color="white" size={12} />
                                 </div>
                             </div>
@@ -157,7 +157,7 @@ export default function Login() {
                                         top: '12px', 
                                         background: 'none', 
                                         border: 'none', 
-                                        color: 'white', 
+                                        color: 'var(--text-primary)', 
                                         opacity: 0.4,
                                         cursor: 'pointer',
                                         padding: '5px'
@@ -185,7 +185,7 @@ export default function Login() {
                         <button 
                             type="button"
                             onClick={() => handleSocialLogin('google')}
-                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '12px', padding: '10px', display: 'flex', alignItems: 'center', opacity: socialLoading ? 0.5 : 1 }}
+                            style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '12px', padding: '10px', display: 'flex', alignItems: 'center', opacity: socialLoading ? 0.5 : 1, cursor: 'pointer' }}
                             disabled={!!socialLoading}
                         >
                             {socialLoading === 'google' ? '...' : <img src="https://www.google.com/favicon.ico" style={{ width: '20px', height: '20px' }} alt="Google" />}
@@ -193,7 +193,7 @@ export default function Login() {
                         <button 
                             type="button"
                             onClick={() => handleSocialLogin('github')}
-                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '12px', padding: '10px', display: 'flex', alignItems: 'center', opacity: socialLoading ? 0.5 : 1 }}
+                            style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '12px', padding: '10px', display: 'flex', alignItems: 'center', opacity: socialLoading ? 0.5 : 1, cursor: 'pointer' }}
                             disabled={!!socialLoading}
                         >
                             {socialLoading === 'github' ? '...' : <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>}
@@ -201,7 +201,7 @@ export default function Login() {
                         <button 
                             type="button"
                             onClick={() => handleSocialLogin('microsoft')}
-                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '12px', padding: '10px', display: 'flex', alignItems: 'center', opacity: socialLoading ? 0.5 : 1 }}
+                            style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '12px', padding: '10px', display: 'flex', alignItems: 'center', opacity: socialLoading ? 0.5 : 1, cursor: 'pointer' }}
                             disabled={!!socialLoading}
                         >
                             {socialLoading === 'microsoft' ? '...' : <svg width="20" height="20" viewBox="0 0 23 23"><rect width="10.8" height="10.8" fill="#f25022"/><rect x="12.2" width="10.8" height="10.8" fill="#7fba00"/><rect y="12.2" width="10.8" height="10.8" fill="#00a4ef"/><rect x="12.2" y="12.2" width="10.8" height="10.8" fill="#ffb900"/></svg>}

@@ -66,17 +66,17 @@ export default function GroupChat() {
         }
     };
 
-    if (loading) return <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Loading space...</div>;
+    if (loading) return <div style={{ color: 'var(--text-primary)', textAlign: 'center', marginTop: '50px' }}>Loading space...</div>;
 
     return (
-        <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 10 }}>
+        <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 10, color: 'var(--text-primary)' }}>
             {/* Header */}
-            <div style={{ padding: '20px 40px', background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(10px)', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ padding: '20px 40px', background: 'var(--glass-bg)', backdropFilter: 'blur(10px)', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <button onClick={() => navigate('/social')} style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer' }}>←</button>
+                    <button onClick={() => navigate('/social')} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', fontSize: '1.5rem', cursor: 'pointer' }}>←</button>
                     <div>
                         <h2 style={{ margin: 0, fontSize: '1.5rem' }}>{group?.name}</h2>
-                        <span style={{ fontSize: '0.8em', opacity: 0.6, background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '4px' }}>
+                        <span style={{ fontSize: '0.8em', opacity: 0.6, background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', padding: '2px 8px', borderRadius: '4px' }}>
                             Code: {group?.inviteCode}
                         </span>
                     </div>
@@ -104,9 +104,10 @@ export default function GroupChat() {
                             <div style={{
                                 padding: '12px 18px',
                                 borderRadius: '20px',
-                                background: isMe ? 'linear-gradient(135deg, #FF2E63, #FF0055)' : 'rgba(255,255,255,0.1)',
+                                background: isMe ? 'linear-gradient(135deg, var(--accent-color), #FF0055)' : 'var(--glass-bg)',
                                 backdropFilter: 'blur(5px)',
-                                border: '1px solid rgba(255,255,255,0.1)',
+                                border: '1px solid var(--glass-border)',
+                                color: isMe ? 'var(--btn-text)' : 'var(--text-primary)',
                                 borderBottomRightRadius: isMe ? '4px' : '20px',
                                 borderBottomLeftRadius: isMe ? '20px' : '4px'
                             }}>
@@ -119,7 +120,7 @@ export default function GroupChat() {
             </div>
 
             {/* Input Area */}
-            <div style={{ padding: '20px', background: 'rgba(0,0,0,0.2)', backdropFilter: 'blur(10px)' }}>
+            <div style={{ padding: '20px', background: 'var(--glass-bg)', borderTop: '1px solid var(--glass-border)', backdropFilter: 'blur(10px)' }}>
                 <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '10px', maxWidth: '1000px', margin: '0 auto' }}>
 
                     <input
@@ -127,7 +128,7 @@ export default function GroupChat() {
                         placeholder="Type a message..."
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
-                        style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '30px', padding: '15px 25px', color: 'white', outline: 'none' }}
+                        style={{ flex: 1, background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '30px', padding: '15px 25px', color: 'var(--text-primary)', outline: 'none' }}
                     />
                     <button
                         type="submit"

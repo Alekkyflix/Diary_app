@@ -84,7 +84,7 @@ html.custom-cursor-active [role="button"] {
 
 input,
 textarea {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   color: var(--text-primary);
   padding: 12px;
@@ -107,7 +107,7 @@ button {
 
 .btn-primary {
   background: var(--accent-color);
-  color: #fff;
+  color: var(--btn-text);
   border: none;
   padding: 12px 24px;
   border-radius: 50px;

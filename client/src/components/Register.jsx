@@ -65,13 +65,13 @@ export default function Register() {
     };
 
     return (
-        <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 10 }}>
+        <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', zIndex: 10, color: 'var(--text-primary)' }}>
             {showSuccess && (
                 <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
                     <div className="glass-panel" style={{ padding: '40px', textAlign: 'center', maxWidth: '400px' }}>
                         <h1 style={{ fontSize: '4rem', margin: '0 0 20px 0' }}>🎉</h1>
                         <h2 style={{ color: 'var(--accent-color)', marginBottom: '10px' }}>You're In!</h2>
-                        <p style={{ fontSize: '1.2em', marginBottom: '20px' }}>Welcome to the club. Your secret space is ready.</p>
+                        <p style={{ fontSize: '1.2em', marginBottom: '20px', color: 'var(--text-primary)' }}>Welcome to the club. Your secret space is ready.</p>
                         <p style={{ fontSize: '0.9em', opacity: 0.7 }}>Warping to login...</p>
                     </div>
                 </div>
@@ -100,7 +100,7 @@ export default function Register() {
                                 top: '10px', 
                                 background: 'none', 
                                 border: 'none', 
-                                color: 'white', 
+                                color: 'var(--text-primary)', 
                                 opacity: 0.4,
                                 cursor: 'pointer',
                                 padding: '5px'
@@ -117,7 +117,7 @@ export default function Register() {
                 <div style={{ marginTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
                     <p style={{ fontSize: '0.8em', opacity: 0.5, marginBottom: '15px' }}>Or join with</p>
                     <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
-                        <button type="button" onClick={() => handleSocialLogin('google')} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '12px', padding: '10px', display: 'flex', alignItems: 'center', opacity: socialLoading ? 0.5 : 1 }} disabled={!!socialLoading}>
+                        <button type="button" onClick={() => handleSocialLogin('google')} style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '12px', padding: '10px', display: 'flex', alignItems: 'center', opacity: socialLoading ? 0.5 : 1, cursor: 'pointer' }} disabled={!!socialLoading}>
                             {socialLoading === 'google' ? '...' : <img src="https://www.google.com/favicon.ico" style={{ width: '20px', height: '20px' }} alt="Google" />}
                         </button>
                         <button type="button" onClick={() => handleSocialLogin('github')} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '12px', padding: '10px', display: 'flex', alignItems: 'center', opacity: socialLoading ? 0.5 : 1 }} disabled={!!socialLoading}>

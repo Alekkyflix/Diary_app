@@ -60,14 +60,15 @@ export default function DailySnapsWidget() {
                     style={{
                         flex: '0 0 150px', height: '250px',
                         borderRadius: '20px',
-                        border: '2px dashed rgba(255,255,255,0.3)',
+                        border: '2px dashed var(--glass-border)',
                         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                         cursor: 'pointer',
-                        background: 'rgba(255,255,255,0.05)'
+                        background: 'var(--glass-bg)',
+                        color: 'var(--text-primary)'
                     }}
                 >
                     <div style={{ background: 'var(--accent-color)', borderRadius: '50%', width: 50, height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px' }}>
-                        <Plus size={24} color="white" />
+                        <Plus size={24} color="var(--btn-text)" />
                     </div>
                     <span style={{ fontSize: '0.9em', opacity: 0.8 }}>Add Snap</span>
                 </div>
@@ -97,8 +98,8 @@ export default function DailySnapsWidget() {
                             display: 'flex', justifyContent: 'center', gap: '5px',
                             marginTop: '-15px', position: 'relative', zIndex: 5
                         }}>
-                            <button onClick={() => handleReact(snap.id, '❤️')} style={{ border: 'none', background: 'white', borderRadius: '50%', width: 30, height: 30, boxShadow: '0 5px 15px rgba(0,0,0,0.2)', cursor: 'pointer' }}>❤️</button>
-                            <button onClick={() => handleReact(snap.id, '🔥')} style={{ border: 'none', background: 'white', borderRadius: '50%', width: 30, height: 30, boxShadow: '0 5px 15px rgba(0,0,0,0.2)', cursor: 'pointer' }}>🔥</button>
+                            <button onClick={() => handleReact(snap.id, '❤️')} style={{ border: '1px solid var(--glass-border)', background: 'var(--glass-bg)', borderRadius: '50%', width: 30, height: 30, boxShadow: '0 5px 15px rgba(0,0,0,0.2)', cursor: 'pointer' }}>❤️</button>
+                            <button onClick={() => handleReact(snap.id, '🔥')} style={{ border: '1px solid var(--glass-border)', background: 'var(--glass-bg)', borderRadius: '50%', width: 30, height: 30, boxShadow: '0 5px 15px rgba(0,0,0,0.2)', cursor: 'pointer' }}>🔥</button>
                         </div>
 
                         {/* Reaction Counts */}
