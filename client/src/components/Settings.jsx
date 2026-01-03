@@ -8,7 +8,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import CustomAlert from './CustomAlert';
 
 export default function Settings() {
-    const { theme, setTheme, themes, season, setSeason } = useTheme();
+    const { theme, setTheme, themes, season, setSeason, isTiltEnabled, setIsTiltEnabled } = useTheme();
     const [activeTab, setActiveTab] = useState('account');
     const [settings, setSettings] = useState({
         email: '',
@@ -758,6 +758,46 @@ export default function Settings() {
                                             <span>{s.label}</span>
                                         </button>
                                     ))}
+                                </div>
+
+                                <h3 style={{ marginTop: '40px', marginBottom: '20px' }}>Interactive Effects</h3>
+                                <div style={{ 
+                                    padding: '20px', 
+                                    background: 'var(--glass-bg)', 
+                                    borderRadius: '16px', 
+                                    border: '1px solid var(--glass-border)',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center'
+                                }}>
+                                    <div>
+                                        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Card Tilt Animation</div>
+                                        <div style={{ fontSize: '0.8em', opacity: 0.6 }}>Disable mouse-tracking tilt effect if you find it distracting.</div>
+                                    </div>
+                                    <div 
+                                        onClick={() => setIsTiltEnabled(!isTiltEnabled)}
+                                        style={{ 
+                                            width: '50px', 
+                                            height: '26px', 
+                                            background: isTiltEnabled ? 'var(--accent-color)' : 'rgba(255,255,255,0.1)', 
+                                            borderRadius: '13px', 
+                                            position: 'relative',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s'
+                                        }}
+                                    >
+                                        <div style={{ 
+                                            width: '20px', 
+                                            height: '20px', 
+                                            background: 'white', 
+                                            borderRadius: '50%', 
+                                            position: 'absolute',
+                                            top: '3px',
+                                            left: isTiltEnabled ? '27px' : '3px',
+                                            transition: 'all 0.3s',
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                        }} />
+                                    </div>
                                 </div>
                             </div>
                         )}

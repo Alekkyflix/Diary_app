@@ -92,6 +92,8 @@ export const ThemeProvider = ({ children }) => {
         }
     };
 
+    const [isTiltEnabled, setIsTiltEnabled] = useState(localStorage.getItem('isTiltEnabled') !== 'false');
+
     useEffect(() => {
         const root = document.documentElement;
         const currentTheme = themes[theme] || themes.dark;
@@ -111,11 +113,12 @@ export const ThemeProvider = ({ children }) => {
         
         localStorage.setItem('theme', theme);
         localStorage.setItem('season', season);
+        localStorage.setItem('isTiltEnabled', isTiltEnabled);
         document.body.className = `theme-${theme} season-${season}`;
-    }, [theme, season]);
+    }, [theme, season, isTiltEnabled]);
 
     return (
-        <ThemeContext.Provider value={{ theme, setTheme, themes, season, setSeason }}>
+        <ThemeContext.Provider value={{ theme, setTheme, themes, season, setSeason, isTiltEnabled, setIsTiltEnabled }}>
             {children}
         </ThemeContext.Provider>
     );

@@ -1,7 +1,9 @@
 import React, { useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function TiltedGlassCard({ children, className = "", style = {} }) {
+    const { isTiltEnabled } = useTheme();
     const ref = useRef(null);
 
     const x = useMotionValue(0);
@@ -14,7 +16,7 @@ export default function TiltedGlassCard({ children, className = "", style = {} }
     const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
 
     const handleMouseMove = (e) => {
-        if (!ref.current) return;
+        if (!ref.current || !isTiltEnabled) return;
 
         const rect = ref.current.getBoundingClientRect();
 
@@ -42,8 +44,8 @@ export default function TiltedGlassCard({ children, className = "", style = {} }
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             style={{
-                rotateY,
-                rotateX,
+                rotateY: isTiltEnabled ? rotateY : "0deg",
+                rotateX: isTiltEnabled ? rotateX : "0deg",
                 transformStyle: "preserve-3d",
                 position: 'relative',
                 ...style
