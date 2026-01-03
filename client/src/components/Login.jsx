@@ -114,6 +114,11 @@ export default function Login() {
                                 {isLoading ? 'Verifying...' : 'Next'}
                             </button>
                         </form>
+                        <div style={{ marginTop: '20px' }}>
+                            <Link to="/register" style={{ color: 'var(--accent-color)', fontWeight: 'bold', fontSize: '0.86em', textDecoration: 'none' }}>
+                                New here? Join the club.
+                            </Link>
+                        </div>
                     </>
                 ) : (
                     <>

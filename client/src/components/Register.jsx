@@ -114,6 +114,11 @@ export default function Register() {
                         {isLoading ? 'Creating Account...' : 'Register'}
                     </button>
                 </form>
+                <div style={{ marginTop: '20px' }}>
+                    <Link to="/login" style={{ color: 'var(--accent-color)', fontWeight: 'bold', fontSize: '0.86em', textDecoration: 'none' }}>
+                        Already a member? Sign in.
+                    </Link>
+                </div>
                 <div style={{ marginTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
                     <p style={{ fontSize: '0.8em', opacity: 0.5, marginBottom: '15px' }}>Or join with</p>
                     <div style={{ display: 'flex', justifyContent: 'center', gap: '15px' }}>
