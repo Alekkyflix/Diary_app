@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api';
-import { User, Shield, Eye, EyeOff, Palette, Trash2, Save, Key, Camera, Upload, X, Clock, Lock } from 'lucide-react';
+import { User, Shield, Eye, EyeOff, Palette, Trash2, Save, Key, Camera, Upload, X, Clock, Lock, Moon, Cloud, Leaf, Crown, Zap, Sun, Terminal } from 'lucide-react';
 
 import TiltedGlassCard from './TiltedGlassCard';
 import { useTheme } from '../contexts/ThemeContext';
@@ -660,44 +660,70 @@ export default function Settings() {
                             <div>
                                 <h3 style={{ marginBottom: '20px' }}>Personalize Theme</h3>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '15px' }}>
-                                    {Object.entries(themes).map(([key, t]) => (
-                                        <button 
-                                            key={key} 
-                                            type="button"
-                                            onMouseDown={() => { 
-                                                console.log("Theme mousedown:", key);
-                                                setTheme(key); 
-                                            }}
-                                            onClick={() => { 
-                                                console.log("Theme clicked:", key);
-                                                const newSettings = { ...settings, themePreference: key };
-                                                setSettings(newSettings);
-                                                setTheme(key);
-                                                handleUpdateSettings(newSettings);
-                                            }}
-                                            style={{
-                                                padding: '20px',
-                                                borderRadius: '20px',
-                                                background: t.bg,
-                                                border: `3px solid ${theme === key ? t.accent : 'var(--glass-border)'}`,
-                                                cursor: 'pointer',
-                                                textAlign: 'center',
-                                                transition: 'all 0.2s',
-                                                display: 'block',
-                                                width: '100%',
-                                                boxSizing: 'border-box',
-                                                position: 'relative',
-                                                zIndex: 100,
-                                                pointerEvents: 'auto'
-                                            }}
-                                            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-5px)'}
-                                            onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
-                                            aria-label={`Select ${t.name} theme`}
-                                        >
-                                            <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: t.accent, margin: '0 auto 15px', pointerEvents: 'none', boxShadow: `0 0 20px ${t.accent}44` }}></div>
-                                            <div style={{ color: t.text, fontSize: '0.9em', fontWeight: 'bold', pointerEvents: 'none' }}>{t.name}</div>
-                                        </button>
-                                    ))}
+                                    {(() => {
+                                        const themeIcons = {
+                                            dark: <Moon size={24} />,
+                                            light: <Cloud size={24} />,
+                                            emerald: <Leaf size={24} />,
+                                            royal: <Crown size={24} />,
+                                            aurora: <Zap size={24} />,
+                                            sunset: <Sun size={24} />,
+                                            hacker: <Terminal size={24} />
+                                        };
+
+                                        return Object.entries(themes).map(([key, t]) => (
+                                            <button 
+                                                key={key} 
+                                                type="button"
+                                                onMouseDown={() => { 
+                                                    console.log("Theme mousedown:", key);
+                                                    setTheme(key); 
+                                                }}
+                                                onClick={() => { 
+                                                    console.log("Theme clicked:", key);
+                                                    const newSettings = { ...settings, themePreference: key };
+                                                    setSettings(newSettings);
+                                                    setTheme(key);
+                                                    handleUpdateSettings(newSettings);
+                                                }}
+                                                style={{
+                                                    padding: '20px',
+                                                    borderRadius: '20px',
+                                                    background: t.bg,
+                                                    border: `3px solid ${theme === key ? t.accent : 'var(--glass-border)'}`,
+                                                    cursor: 'pointer',
+                                                    textAlign: 'center',
+                                                    transition: 'all 0.2s',
+                                                    display: 'block',
+                                                    width: '100%',
+                                                    boxSizing: 'border-box',
+                                                    position: 'relative',
+                                                    zIndex: 100,
+                                                    pointerEvents: 'auto'
+                                                }}
+                                                onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-5px)'}
+                                                onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                                                aria-label={`Select ${t.name} theme`}
+                                            >
+                                                <div style={{ 
+                                                    width: '50px', 
+                                                    height: '50px', 
+                                                    borderRadius: '50%', 
+                                                    background: t.accent, 
+                                                    margin: '0 auto 15px', 
+                                                    pointerEvents: 'none', 
+                                                    boxShadow: `0 0 20px ${t.accent}44`,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    color: t.btnText || 'white'
+                                                }}>
+                                                    {themeIcons[key] || <Palette size={24} />}
+                                                </div>
+                                                <div style={{ color: t.text, fontSize: '0.9em', fontWeight: 'bold', pointerEvents: 'none' }}>{t.name}</div>
+                                            </button>
+                                        ));
+                                    })()}
                                 </div>
 
                                 <h3 style={{ marginTop: '40px', marginBottom: '20px' }}>Seasonal Effects</h3>
